@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Management System | Lab Reports</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+      background-color: #f4f7fa;
+      color: #333;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 250px;
+      background-color: #1e88e5;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 15px;
+      flex-shrink: 0;
+    }
+
+    .sidebar h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .nav-link {
+      color: #e3f2fd;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background-color: #1565c0;
+      color: #fff;
+    }
+
+    .nav-link i {
+      font-size: 1.2rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    /* Top Navbar */
+    .topbar {
+      background-color: #fff;
+      padding: 15px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+      flex-shrink: 0;
+    }
+
+    .topbar h1 {
+      font-size: 1.5rem;
+      color: #2c3e50;
+      margin: 0;
+    }
+
+    .btn-logout {
+      background-color: #e53935;
+      color: #fff;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      padding: 8px 15px;
+      text-decoration: none;
+    }
+
+    /* Section Styling */
+    .dashboard {
+      padding: 30px;
+    }
+
+    /* Cards */
+    .card-section {
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+      background-color: #fff;
+      padding: 25px;
+      margin-bottom: 40px;
+    }
+
+    .card-section h2 {
+      color: #17a2b8;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    /* Table Styling */
+    .table thead th {
+      background-color: #17a2b8;
+      color: #fff;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .table tbody td {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .table-text-content {
+      display: block;
+      max-height: 2.8em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+    }
+
+    /* Buttons */
+    .btn-save {
+      background-color: #17a2b8;
+      color: #fff;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 10px 20px;
+      transition: 0.3s ease;
+    }
+
+    .btn-save:hover {
+      background-color: #117a8b;
+    }
+
+    .btn-action {
+      border-radius: 50px;
+      padding: 5px 10px;
+      font-size: 0.85rem;
+      margin: 0 2px;
+    }
+
+    .btn-edit {
+      background-color: #ffc107;
+      color: #333;
+    }
+
+    .btn-delete {
+      background-color: #dc3545;
+      color: #fff;
+    }
+
+    .btn-edit:hover {
+      background-color: #e0a800;
+    }
+
+    .btn-delete:hover {
+      background-color: #c82333;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      body {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <h2>🏥 HMS Admin</h2>
+    <nav class="nav flex-column">
+      <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+      <a class="nav-link" th:href="@{/doctors}"><i class="bi bi-person-badge"></i> Doctors</a>
+      <a class="nav-link" th:href="@{/patients}"><i class="bi bi-people"></i> Patients</a>
+      <a class="nav-link" th:href="@{/appointments}"><i class="bi bi-calendar-event"></i> Appointments</a>
+      <a class="nav-link" th:href="@{/bills}"><i class="bi bi-cash-coin"></i> Bills</a>
+      <a class="nav-link" th:href="@{/prescriptions}"><i class="bi bi-capsule"></i> Prescriptions</a>
+      <a class="nav-link active" th:href="@{/labreports}"><i class="bi bi-beaker"></i> Lab Reports</a>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <h1>Lab Reports Management</h1>
+      <a href="#" class="btn-logout">Logout</a>
+    </div>
+
+    <section class="dashboard">
+      <!-- Add New Lab Report Form -->
+      <div class="card-section">
+        <h2><i class="bi bi-file-earmark-plus me-2"></i>Add New Lab Report</h2>
+        <form th:action="@{/labreports}" method="post" class="row g-3">
+          <div class="col-md-4">
+            <label for="testName" class="form-label">Test Name</label>
+            <input type="text" name="testName" id="testName" class="form-control" placeholder="e.g., Blood Test, X-Ray" required />
+          </div>
+          <div class="col-md-4">
+            <label for="patientId" class="form-label">Patient ID</label>
+            <input type="number" name="patientId" id="patientId" class="form-control" required />
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn-save w-100">Save Report</button>
+          </div>
+          <div class="col-12">
+            <label for="result" class="form-label">Result</label>
+            <textarea name="result" id="result" class="form-control" rows="3" placeholder="Enter detailed findings and values..." required></textarea>
+          </div>
+          <div class="col-12">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea name="notes" id="notes" class="form-control" rows="2" placeholder="Doctor's comments or next steps..."></textarea>
+          </div>
+        </form>
+      </div>
+
+      <!-- Lab Reports Table -->
+      <div class="card-section">
+        <h2><i class="bi bi-clipboard-data me-2"></i>All Lab Reports</h2>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover table-bordered align-middle">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Test</th>
+                <th>Result</th>
+                <th>Date</th>
+                <th>Notes</th>
+                <th>Patient</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="rep : ${labreports}">
+                <td th:text="${rep.id}"></td>
+                <td th:text="${rep.testName}"></td>
+                <td><div class="table-text-content" th:text="${rep.result}"></div></td>
+                <td th:text="${#temporals.format(rep.reportDate, 'dd-MMM-yyyy HH:mm')}"></td>
+                <td><div class="table-text-content" th:text="${rep.notes}"></div></td>
+                <td th:text="${rep.patient.name}"></td>
+                <td>
+                  <a th:href="@{'/labreports/edit/' + ${rep.id}}" class="btn btn-edit btn-action"><i class="bi bi-pencil-square"></i></a>
+                  <a th:href="@{'/labreports/delete/' + ${rep.id}}" class="btn btn-delete btn-action"><i class="bi bi-trash"></i></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+</body>
+</html>
