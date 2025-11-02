@@ -1,79 +1,213 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctors Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"/>
-    <style>
-        body { display: flex; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #f4f7f9; }
-        .sidebar { width: 250px; background-color: #1e88e5; color: #fff; padding: 20px; flex-shrink: 0; }
-        .sidebar h2 { font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 30px; }
-        .nav-link { color: #e3f2fd; display: flex; align-items: center; gap: 10px; padding: 10px 15px; border-radius: 8px; transition: all 0.2s; text-decoration: none; }
-        .nav-link:hover, .nav-link.active { background-color: #1565c0; color: #fff; }
-        .main-content { flex-grow: 1; overflow-y: auto; padding: 30px; }
-        table th, table td { vertical-align: middle !important; }
-        @media (max-width: 768px) { .sidebar { display: none; } body { flex-direction: column; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctors Management</title>
+  
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/sidebar.css}">
+
+  <style>
+    /* Theme Variables from Dashboard Template */
+    :root {
+      --bg-main: #0d1117;
+      --bg-card: #1c2128;
+      --border-color: #30363d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent-blue: #58a6ff;
+      --accent-green: #3fb950;
+      --accent-red: #f85149;
+      --bg-header: #21262d; /* Table header background */
+      --shadow-soft: rgba(56, 139, 253, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      display: flex;
+      min-height: 100vh;
+      overflow-y: hidden; /* Prevent body scroll */
+    }
+
+    a { text-decoration: none; }
+    
+    /* 🚨 Alignment Fix: The main content is pushed by the sidebar's width */
+    .main-content {
+      flex-grow: 1;
+      overflow-y: auto; /* Allow content to scroll */
+      padding: 40px;
+      /* CRITICAL ALIGNMENT: Match the sidebar's expected width + margin */
+      margin-left: 260px; 
+      transition: margin-left 0.3s ease;
+      background-color: var(--bg-main);
+    }
+
+    /* Sidebar Styling (Placeholder assuming fragment handles details) */
+    .sidebar {
+      width: 250px;
+      flex-shrink: 0;
+      position: fixed; /* Typically fixed if content scrolls next to it */
+      height: 100vh;
+      background-color: #161b22; /* Darker background for the fixed element */
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    
+    .main-content h1 {
+        color: var(--accent-blue); 
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    /* Card/Table Container Styling (Matching Dashboard aesthetic) */
+    .table-container-card {
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        background-color: var(--bg-card);
+        padding: 25px;
+        box-shadow: 0 0 15px var(--shadow-soft);
+    }
+
+    /* Table styling adapted to the new theme */
+    .table {
+      color: var(--text-primary);
+      border-color: var(--border-color);
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background-color: var(--bg-header);
+    }
+    
+    .table thead th {
+        color: var(--accent-blue) !important;
+        border-color: var(--border-color);
+    }
+
+    .table-bordered > :not(caption) > * > * {
+        border-color: var(--border-color);
+    }
+
+    .table tbody tr:hover {
+      background-color: #161b22; /* Slightly lighter hover */
+    }
+
+    /* Button Styling */
+    .btn {
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-success {
+      background-color: var(--accent-green);
+      border: none;
+    }
+
+    .btn-success:hover {
+      background-color: #359844; 
+    }
+
+    .btn-primary {
+      background-color: var(--accent-blue);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #428bca; 
+    }
+
+    .btn-danger {
+      background-color: var(--accent-red);
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background-color: #d13d36;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      .main-content {
+        margin-left: 0; /* Remove margin when sidebar is hidden */
+        padding: 20px;
+      }
+      .sidebar {
+        display: none; /* Hide sidebar on mobile */
+      }
+    }
+  </style>
 </head>
 <body>
 
-<!-- Sidebar -->
-<aside class="sidebar">
-    <h2>🏥 HMS Admin</h2>
-    <nav class="nav flex-column">
-        <a class="nav-link" th:href="@{/dashboard}"><i class="bi bi-speedometer2"></i> Dashboard</a>
-        <a class="nav-link active" th:href="@{/doctors}"><i class="bi bi-person-badge"></i> Doctors</a>
-        <a class="nav-link" th:href="@{/patients}"><i class="bi bi-people"></i> Patients</a>
-        <a class="nav-link" th:href="@{/appointments}"><i class="bi bi-calendar-event"></i> Appointments</a>
-        <a class="nav-link" th:href="@{/bills}"><i class="bi bi-cash-coin"></i> Bills</a>
-        <a class="nav-link" th:href="@{/prescriptions}"><i class="bi bi-capsule"></i> Prescriptions</a>
-        <a class="nav-link" th:href="@{/labreports}"><i class="bi bi-beaker"></i> Lab Reports</a>
-    </nav>
-</aside>
+  <!-- Sidebar -->
+  <div th:replace="fragments/sidebar :: sidebar" class="sidebar"></div> 
 
-<!-- Main Content -->
-<main class="main-content">
+
+  <!-- Main Content -->
+  <main class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-primary">👨‍⚕️ Doctors</h1>
-        <a class="btn btn-success" th:href="@{/doctors/new}"><i class="bi bi-plus-lg"></i> Add Doctor</a>
+      <!-- Changed to h1 and using new theme color via style -->
+      <h1>👨‍⚕️ Doctors Management</h1> 
+      <a class="btn btn-success shadow" th:href="@{/doctors/new}">
+        <i class="bi bi-plus-lg"></i> Add Doctor
+      </a>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover table-bordered align-middle">
+    <!-- Table is now wrapped in a Card container for theme consistency -->
+    <div class="table-container-card">
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover align-middle">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Qualification</th>
-                    <th>Specialization</th>
-                    <th>Actions</th>
-                </tr>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Qualification</th>
+                <th>Specialization</th>
+                <th style="width: 120px;">Actions</th>
+              </tr>
             </thead>
             <tbody>
-                <tr th:each="doctor : ${doctors}">
-                    <td th:text="${doctor.id}"></td>
-                    <td th:text="${doctor.name}"></td>
-                    <td th:text="${doctor.email}"></td>
-                    <td th:text="${doctor.phone}"></td>
-                    <td th:text="${doctor.qualification}"></td>
-                    <td th:text="${doctor.specialization}"></td>
-                    <td>
-                        <a class="btn btn-sm btn-primary" th:href="@{/doctors/edit/{id}(id=${doctor.id})}"><i class="bi bi-pencil"></i></a>
-                        <a class="btn btn-sm btn-danger" th:href="@{/doctors/delete/{id}(id=${doctor.id})}" 
-                           onclick="return confirm('Are you sure you want to delete this doctor?');">
-                           <i class="bi bi-trash"></i>
-                        </a>
-                    </td>
-                </tr>
+              <tr th:each="doctor : ${doctors}">
+                <td th:text="${doctor.id}"></td>
+                <td th:text="${doctor.name}"></td>
+                <td th:text="${doctor.email}"></td>
+                <td th:text="${doctor.phone}"></td>
+                <td th:text="${doctor.qualification}"></td>
+                <td th:text="${doctor.specialization}"></td>
+                <td class="text-center">
+                  <a class="btn btn-sm btn-primary me-1" th:href="@{/doctors/edit/{id}(id=${doctor.id})}">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <a class="btn btn-sm btn-danger" th:href="@{/doctors/delete/{id}(id=${doctor.id})}" 
+                    onclick="return confirm('Are you sure you want to delete this doctor?');">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </td>
+              </tr>
+              <!-- Mock data row if no Thymeleaf data is present for visual check -->
+              <tr th:if="${#lists.isEmpty(doctors)}">
+                  <td colspan="7" class="text-center" style="color: var(--text-secondary);">No doctors found. Please add a new doctor.</td>
+              </tr>
             </tbody>
-        </table>
+          </table>
+        </div>
     </div>
-</main>
+  </main>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
