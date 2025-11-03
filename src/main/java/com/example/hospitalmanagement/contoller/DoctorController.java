@@ -2,6 +2,7 @@ package com.example.hospitalmanagement.controller;
 
 import com.example.hospitalmanagement.model.Doctor;
 import com.example.hospitalmanagement.repository.DoctorRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -62,10 +63,18 @@ public class DoctorController {
         return "redirect:/doctors";
     }
 
-    // Delete doctor
+    // Delete doctor (safe with integrity check)
     @GetMapping("/delete/{id}")
-    public String deleteDoctor(@PathVariable Long id) {
-        doctorRepository.deleteById(id);
+    public String deleteDoctor(@PathVariable Long id, Model model) {
+        try {
+            doctorRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            // Handle foreign key constraint violation (linked appointments)
+            model.addAttribute("errorMessage",
+                    "Cannot delete doctor because appointments are linked to this doctor.");
+            model.addAttribute("doctors", doctorRepository.findAll());
+            return "doctors/list";
+        }
         return "redirect:/doctors";
     }
 }

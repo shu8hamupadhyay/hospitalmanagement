@@ -185,6 +185,16 @@
       transform: scale(1.2);
     }
 
+    /* Error Alert Styling */
+    .alert-danger {
+      background-color: rgba(248, 81, 73, 0.1);
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      box-shadow: 0 0 10px rgba(248, 81, 73, 0.3);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .sidebar { display: none; }
@@ -209,6 +219,9 @@
     </div>
 
     <p class="subtitle">Manage and view all doctors registered in the Hospital Management System.</p>
+
+    <!-- 🔔 Error Message Alert -->
+    <div th:if="${errorMessage}" class="alert alert-danger mb-4" th:text="${errorMessage}"></div>
 
     <div class="table-container-card">
       <div class="table-responsive">
