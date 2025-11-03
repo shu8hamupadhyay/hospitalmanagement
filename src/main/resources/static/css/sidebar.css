@@ -1,207 +1,233 @@
-/* --- 🎨 CSS Variables for Theming --- */
+/*
+|--------------------------------------------------------------------------
+| ⚡ PROFESSIONAL DARK THEME STYLES - SIDEBAR NAVIGATION
+|--------------------------------------------------------------------------
+| A modern, high-contrast dark theme utilizing a vibrant primary accent.
+| Focus on clean lines, smooth transitions, and distinct link separation.
+|
+*/
+
+/* 🎨 CSS Variables for Theming */
 :root {
-  /* Colors */
-  --color-primary: #00c6ff; /* Vibrant Accent Blue/Cyan */
-  --color-secondary: #0a0a0a; /* Deep Black/Near-Black for Background */
-  --color-tertiary: #1a1a1a; /* Slightly lighter black for sections/hover */
-  --color-text-light: #f0f0f0; /* General light text */
-  --color-text-muted: #bdbdcf; /* Muted text for links */
-  --color-shadow: rgba(0, 0, 0, 0.7); /* Deep Shadow */
+    /* --- Colors --- */
+    --color-primary: #00c6ff;     /* Vibrant Accent Blue/Cyan (Main Highlight) */
+    --color-primary-dark: #00a0cc; /* Darker Primary for active/focus states */
+    --color-secondary: #0a0a0a;   /* Deep Black/Near-Black for Base Background */
+    --color-tertiary: #1b1b1b;    /* Slightly lighter black for sections/hover */
+    --color-text-light: #f0f0f0;  /* General light text */
+    --color-text-muted: #a0a0b0;  /* Muted text for default links and secondary info */
+    --color-shadow: rgba(0, 0, 0, 0.85); /* Deeper, more noticeable shadow */
 
-  /* Spacing */
-  --spacing-unit: 8px;
-  --sidebar-width: 260px;
+    /* --- Spacing & Layout --- */
+    --spacing-unit: 8px;
+    --sidebar-width: 280px; /* Slightly wider sidebar for better content balance */
 
-  /* Transitions */
-  --transition-speed: 0.35s;
+    /* --- Transitions --- */
+    --transition-speed: 0.4s; /* Slightly slower for a more 'premium' feel */
+    --transition-bezier: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* 🌙 Sidebar Container */
+/* -------------------------------------------------- */
 .sidebar {
-  width: var(--sidebar-width);
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  /* Deep gradient for a premium dark look */
-  background: linear-gradient(180deg, var(--color-secondary) 0%, #000000 100%);
-  color: var(--color-text-light);
-  display: flex;
-  flex-direction: column;
-  padding: 2.5rem 1rem; /* Use rem for scalability */
-  transition: all var(--transition-speed) ease-in-out;
-  overflow-y: auto;
-  z-index: 1050;
-  /* Stronger, deeper shadow */
-  box-shadow: 4px 0 15px var(--color-shadow);
-  font-family: "Poppins", sans-serif;
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    /* Premium dark gradient */
+    background: linear-gradient(180deg, var(--color-secondary) 0%, #000000 100%);
+    color: var(--color-text-light);
+    display: flex;
+    flex-direction: column;
+    padding: 3rem 1.5rem; /* Generous padding for breathing room */
+    transition: all var(--transition-speed) var(--transition-bezier);
+    overflow-y: auto;
+    z-index: 1050;
+    /* Refined box shadow for depth */
+    box-shadow: 6px 0 20px var(--color-shadow);
+    font-family: "Poppins", sans-serif;
+    line-height: 1.5; /* Improved readability */
 }
 
-/* --- */
-
 /* 🧭 Sidebar Header */
+/* -------------------------------------------------- */
 .sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem; /* Increased margin */
-  padding: 0 var(--spacing-unit);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem; /* More space below header */
+    padding: 0; /* Remove horizontal padding from header itself */
 }
 
 .sidebar-header h2 {
-  font-size: 1.5rem; /* Larger font size */
-  color: var(--color-primary);
-  font-weight: 700;
-  margin: 0;
-  /* Subtle text shadow for a glow effect */
-  text-shadow: 0 0 2px rgba(0, 198, 255, 0.5);
+    font-size: 1.65rem; /* Slightly larger, commanding title */
+    color: var(--color-primary);
+    font-weight: 800; /* Extra bold */
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    /* Subtler, sharper text shadow */
+    text-shadow: 0 0 4px rgba(0, 198, 255, 0.7);
 }
 
 .toggle-btn {
-  background: none;
-  border: none;
-  color: var(--color-primary);
-  font-size: 1.6rem;
-  cursor: pointer;
-  opacity: 0.85;
-  transition: opacity 0.2s ease;
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 1.8rem; /* Larger icon for better touch target */
+    cursor: pointer;
+    opacity: 0.9;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 5px; /* Add padding for better touch target */
 }
 
 .toggle-btn:hover {
-  opacity: 1;
+    opacity: 1;
+    color: var(--color-primary-dark);
+    transform: scale(1.1);
 }
 
-/* --- */
+/* 📋 Nav Links List & Items */
+/* -------------------------------------------------- */
+.sidebar nav {
+    flex-grow: 1; /* Allows nav section to take available space */
+}
 
-/* 📋 Nav Links */
 .sidebar .nav-link {
-  color: var(--color-text-muted);
-  padding: 1rem 1.25rem; /* Improved padding */
-  display: flex;
-  align-items: center;
-  border-radius: 8px; /* Slightly reduced radius for cleaner look */
-  font-size: 15px;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  text-decoration: none;
-  /* Smoother transition */
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: var(--color-text-muted);
+    padding: 0.9rem 1.25rem; /* Vertical/Horizontal padding */
+    display: flex;
+    align-items: center;
+    border-radius: 6px; /* Clean, modern radius */
+    font-size: 1rem; /* Standard readable font size */
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    gap: 12px; /* Use flex gap for spacing (more modern) */
+    /* Smoother, consistent transition on multiple properties */
+    transition: background-color 0.3s var(--transition-bezier), color 0.3s var(--transition-bezier), transform 0.3s var(--transition-bezier), box-shadow 0.3s ease;
 }
 
 /* 🧲 Icons beside text */
 .sidebar .nav-link i {
-  font-size: 1.15rem; /* Slightly larger icon */
-  margin-right: 12px;
-  color: var(--color-primary); /* Icon color remains vibrant */
-  transition: all 0.3s ease;
-  opacity: 0.7;
+    font-size: 1.25rem; /* Prominent icon size */
+    /* Removed margin-right, using 'gap' on the parent for spacing */
+    color: var(--color-primary);
+    opacity: 0.8;
+    transition: color 0.3s ease, opacity 0.3s ease;
 }
 
-/* --- */
-
 /* ✨ Hover and Active States */
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
-  /* Use a subtle solid color for the background on hover */
-  background: var(--color-tertiary);
-  color: var(--color-primary);
-  /* More dramatic effect on hover */
-  transform: translateX(6px); 
-  box-shadow: 0 0 10px rgba(0, 198, 255, 0.2); /* Subtle glow effect */
+/* -------------------------------------------------- */
+.sidebar .nav-link:hover {
+    /* Subtle solid color for the background on hover */
+    background: var(--color-tertiary);
+    color: var(--color-text-light); /* Text brightens slightly on hover */
+    transform: translateX(3px); /* Subtler, classier horizontal shift */
+    box-shadow: 0 0 8px rgba(0, 198, 255, 0.1); /* Very subtle glow */
 }
 
 .sidebar .nav-link:hover i {
-  color: var(--color-primary);
-  opacity: 1;
+    color: var(--color-primary-dark);
+    opacity: 1;
 }
 
 /* Active link gets a clear visual indicator */
 .sidebar .nav-link.active {
-  background: rgba(0, 198, 255, 0.15); /* Slightly darker/more saturated active background */
-  border-left: 4px solid var(--color-primary); /* New: left border highlight */
-  padding-left: calc(1.25rem - 4px); /* Adjust padding due to border */
-  font-weight: 600; /* Bolder active text */
+    background: rgba(0, 198, 255, 0.1); /* Light, semi-transparent background */
+    color: var(--color-primary);
+    border-left: 4px solid var(--color-primary); /* Prominent left border highlight */
+    padding-left: calc(1.25rem - 4px); /* Adjust padding due to border */
+    font-weight: 600;
+    /* Active links don't shift, they're anchored by the border */
+    transform: none;
+    box-shadow: 0 0 12px rgba(0, 198, 255, 0.3); /* Clearer, contained glow for active */
 }
 
-/* --- */
+.sidebar .nav-link.active i {
+    color: var(--color-primary);
+    opacity: 1;
+}
 
-/* 🔥 Scrollbar Styling */
+/* 🔥 Scrollbar Styling (Consistent Professional Look) */
+/* -------------------------------------------------- */
 .sidebar::-webkit-scrollbar {
-  width: 8px; /* Slightly wider scrollbar */
+    width: 6px; /* Sleeker, thinner scrollbar */
 }
 .sidebar::-webkit-scrollbar-track {
-  background: var(--color-secondary);
+    background: var(--color-secondary);
 }
 .sidebar::-webkit-scrollbar-thumb {
-  background: #333; /* Darker thumb */
-  border-radius: 4px;
+    background: #444; /* Medium dark thumb */
+    border-radius: 3px;
 }
 .sidebar::-webkit-scrollbar-thumb:hover {
-  background: #555;
+    background: #666;
 }
 
-/* --- */
-
-/* ✅ Main Content (so it doesn’t overlap sidebar) */
+/* ✅ Main Content */
+/* -------------------------------------------------- */
 .main-content {
-  margin-left: var(--sidebar-width);
-  padding: 3rem 4rem; /* Generous padding */
-  background-color: var(--color-secondary); /* Matches sidebar base */
-  color: var(--color-text-light);
-  min-height: 100vh;
-  transition: margin-left var(--transition-speed) ease;
-  font-family: "Poppins", sans-serif;
+    margin-left: var(--sidebar-width);
+    padding: 3.5rem 4rem; /* Generous padding for spacious content */
+    background-color: var(--color-secondary);
+    color: var(--color-text-light);
+    min-height: 100vh;
+    transition: margin-left var(--transition-speed) var(--transition-bezier);
+    font-family: "Poppins", sans-serif;
 }
 
 .main-content h1,
 .main-content h2 {
-  color: var(--color-primary);
-  text-shadow: 0 0 1px rgba(0, 198, 255, 0.3);
+    color: var(--color-primary);
+    text-shadow: 0 0 3px rgba(0, 198, 255, 0.4);
+    font-weight: 700;
 }
-
-/* --- */
 
 /* 🍔 Mobile View */
-@media (max-width: 768px) {
-  .sidebar {
-    left: calc(-1 * var(--sidebar-width));
-    padding-top: 5rem; /* More space for a fixed header/nav on mobile */
-  }
+/* -------------------------------------------------- */
+@media (max-width: 992px) { /* Changed breakpoint to a common tablet size */
+    .sidebar {
+        width: 250px; /* Slightly reduced width on smaller screens */
+        left: calc(-1 * 250px);
+        padding-top: 5rem;
+    }
 
-  .sidebar.active {
-    left: 0;
-  }
+    .sidebar.active {
+        left: 0;
+    }
 
-  .main-content {
-    margin-left: 0;
-    padding: 2rem 1.5rem;
-  }
+    .main-content {
+        margin-left: 0;
+        padding: 2rem 1rem; /* Adjusted mobile padding */
+    }
 
-  .toggle-btn {
-    display: block;
-    /* Optional: Position the toggle button in the main-content on mobile */
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1060;
-    background: var(--color-tertiary);
-    padding: 10px;
-    border-radius: 50%;
-    box-shadow: 0 2px 5px var(--color-shadow);
-  }
+    /* Fixed, prominent toggle button for mobile */
+    .toggle-btn {
+        display: block;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1060;
+        background: var(--color-tertiary);
+        padding: 10px 12px;
+        border-radius: 50%;
+        box-shadow: 0 4px 10px var(--color-shadow);
+    }
 }
 
-/* --- */
-
-/* 🩶 Optional Overlay for Mobile */
+/* 🩶 Optional Overlay for Mobile (Crucial for professional UX) */
+/* -------------------------------------------------- */
 .sidebar-overlay {
-  display: none;
+    display: none;
 }
 
 .sidebar-overlay.active {
-  display: block;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.8); /* Darker overlay */
-  z-index: 1040;
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7); /* Dark, semi-transparent overlay */
+    backdrop-filter: blur(2px); /* Subtle blur adds a modern touch */
+    z-index: 1040;
 }

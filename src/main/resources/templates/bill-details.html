@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HMS Admin | All Bills</title>
+  <title th:text="'Bill Details - ' + ${bill.invoiceNumber}">Bill Details</title>
 
   <!-- Bootstrap & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <link th:href="@{/css/sidebar.css}" rel="stylesheet"/> <!-- ✅ Sidebar CSS fragment -->
+  <link th:href="@{/css/sidebar.css}" rel="stylesheet"/>
 
   <style>
     body {
@@ -21,17 +21,16 @@
       overflow: hidden;
     }
 
-    /* ✅ Main Content Layout */
+    /* Layout */
     .main-content {
       flex-grow: 1;
       overflow-y: auto;
-      background-color: #0d1117;
       padding: 30px;
+      background-color: #0d1117;
       margin-left: 260px;
       transition: margin-left 0.3s ease;
     }
 
-    /* ✅ Mobile Sidebar Toggle */
     .toggle-btn {
       display: none;
       position: fixed;
@@ -45,7 +44,7 @@
       cursor: pointer;
     }
 
-    /* ✅ Section Title */
+    /* Section title */
     .section-title {
       color: #3fb950;
       font-weight: 700;
@@ -56,17 +55,23 @@
       gap: 10px;
     }
 
-    /* ✅ Table Card Container */
+    /* Cards */
     .card-section {
       background-color: #161b22;
       border: 1px solid #21262d;
       border-radius: 12px;
       padding: 25px;
-      margin-bottom: 35px;
+      margin-bottom: 30px;
       box-shadow: 0 0 15px rgba(56, 139, 253, 0.05);
     }
 
-    /* ✅ Table Styling */
+    .card-section h5 {
+      color: #58a6ff;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    /* Table */
     .table {
       color: #c9d1d9;
       border-color: #30363d;
@@ -75,13 +80,7 @@
     .table thead th {
       background-color: #1e2631;
       color: #58a6ff;
-      font-weight: 600;
       text-align: center;
-    }
-
-    .table tbody tr:hover {
-      background-color: #21262d;
-      transition: 0.3s;
     }
 
     .table tbody td {
@@ -89,41 +88,14 @@
       vertical-align: middle;
     }
 
-    .btn {
-      border-radius: 6px;
-      font-weight: 500;
+    .table tbody tr:hover {
+      background-color: #21262d;
     }
 
-    .btn-success {
-      background-color: #238636;
-      border: none;
-    }
-
-    .btn-success:hover {
-      background-color: #2ea043;
-    }
-
-    .btn-primary {
-      background-color: #1f6feb;
-      border: none;
-    }
-
-    .btn-primary:hover {
-      background-color: #388bfd;
-    }
-
-    .btn-danger {
-      background-color: #f85149;
-      border: none;
-    }
-
-    .btn-danger:hover {
-      background-color: #da3633;
-    }
-
+    /* Buttons */
     .btn-outline-light {
-      color: #c9d1d9;
       border-color: #c9d1d9;
+      color: #c9d1d9;
     }
 
     .btn-outline-light:hover {
@@ -131,29 +103,35 @@
       color: #0d1117;
     }
 
-    /* ✅ Mobile Responsiveness */
+    /* Totals */
+    .totals {
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    .totals strong {
+      color: #3fb950;
+      font-size: 1.2rem;
+    }
+
+    /* Responsive */
     @media (max-width: 768px) {
       .sidebar {
         left: -270px;
       }
-
       .sidebar.active {
         left: 0;
       }
-
       .toggle-btn {
         display: block;
       }
-
       .main-content {
         margin-left: 0;
         padding-top: 70px;
       }
-
       body.sidebar-open {
         overflow: hidden;
       }
-
       .table-responsive {
         overflow-x: auto;
       }
@@ -165,68 +143,79 @@
   <!-- ☰ Toggle Button -->
   <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-list"></i></button>
 
-  <!-- ✅ Sidebar Fragment -->
+  <!-- ✅ Sidebar -->
   <div th:replace="fragments/sidebar :: sidebar"></div>
 
   <!-- ✅ Main Content -->
   <main class="main-content">
-    <h2 class="section-title"><i class="bi bi-receipt"></i> Bills Management</h2>
+    <h2 class="section-title"><i class="bi bi-receipt"></i> Bill Details</h2>
 
+    <!-- Bill Summary -->
     <div class="card-section">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="text-info"><i class="bi bi-file-earmark-text me-2"></i> All Bills</h4>
-        <a href="/bills/new" class="btn btn-success">
-          <i class="bi bi-plus-circle me-1"></i> Create New Bill
-        </a>
+      <h5><i class="bi bi-info-circle me-2"></i> Bill Summary</h5>
+      <div class="row">
+        <div class="col-md-6 mb-2"><strong>Invoice No:</strong> <span th:text="${bill.invoiceNumber}">INV001</span></div>
+        <div class="col-md-6 mb-2"><strong>Date:</strong> 
+          <span th:text="${bill.billDate != null ? #temporals.format(bill.billDate, 'yyyy-MM-dd HH:mm') : 'N/A'}">2025-11-03</span>
+        </div>
+        <div class="col-md-6 mb-2"><strong>Patient:</strong> 
+          <span th:text="${bill.patient != null ? bill.patient.name : 'N/A'}">John Doe</span>
+        </div>
+        <div class="col-md-6 mb-2"><strong>Doctor:</strong> 
+          <span th:text="${bill.doctor != null ? bill.doctor.name : 'N/A'}">Dr. Smith</span>
+        </div>
       </div>
+    </div>
 
+    <!-- Bill Items -->
+    <div class="card-section">
+      <h5><i class="bi bi-list-ul me-2"></i> Bill Items</h5>
       <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover align-middle">
+        <table class="table table-bordered align-middle">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Invoice No</th>
-              <th>Patient</th>
-              <th>Doctor</th>
-              <th>Date</th>
-              <th>Grand Total (₹)</th>
-              <th>Actions</th>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Unit Price (₹)</th>
+              <th>Tax %</th>
+              <th>Discount %</th>
+              <th>Subtotal (₹)</th>
             </tr>
           </thead>
           <tbody>
-            <tr th:if="${#lists.isEmpty(bills)}">
-              <td colspan="7" class="text-center text-muted">No bills available.</td>
+            <tr th:if="${#lists.isEmpty(bill.items)}">
+              <td colspan="6" class="text-center text-muted">No items in this bill.</td>
             </tr>
-
-            <tr th:each="bill, iter : ${bills}">
-              <td th:text="${iter.index + 1}"></td>
-              <td th:text="${bill.id}"></td>
-              <td th:text="${bill.patient != null ? bill.patient.name : 'N/A'}"></td>
-              <td th:text="${bill.doctor != null ? bill.doctor.name : 'N/A'}"></td>
-              <td th:text="${bill.billDate != null ? #temporals.format(bill.billDate, 'yyyy-MM-dd HH:mm') : 'N/A'}"></td>
-              <td th:text="${bill.grandTotal != null ? bill.grandTotal : '0.00'}"></td>
-              <td>
-                <a th:href="@{'/bills/' + ${bill.id}}" class="btn btn-sm btn-primary me-1">
-                  <i class="bi bi-eye"></i>
-                </a>
-                <a th:href="@{'/bills/delete/' + ${bill.id}}" class="btn btn-sm btn-danger"
-                   onclick="return confirm('Are you sure you want to delete this bill?');">
-                  <i class="bi bi-trash"></i>
-                </a>
-              </td>
+            <tr th:each="item : ${bill.items}">
+              <td th:text="${item.description}">Consultation</td>
+              <td th:text="${item.quantity}">1</td>
+              <td th:text="${item.unitPrice}">500</td>
+              <td th:text="${item.taxPercent}">18</td>
+              <td th:text="${item.discountPercent}">5</td>
+              <td th:text="${item.subTotal}">560.00</td>
             </tr>
           </tbody>
         </table>
       </div>
+    </div>
 
-      <a href="/" class="btn btn-outline-light mt-3">
-        <i class="bi bi-house-door me-1"></i> Back to Dashboard
-      </a>
+    <!-- Totals -->
+    <div class="card-section totals">
+      <h5><i class="bi bi-calculator me-2"></i> Totals</h5>
+      <div>Total Before Tax: ₹<span th:text="${bill.totalBeforeTax != null ? bill.totalBeforeTax : '0.00'}">0.00</span></div>
+      <div>Total Discount: ₹<span th:text="${bill.totalDiscount != null ? bill.totalDiscount : '0.00'}">0.00</span></div>
+      <div>Total Tax: ₹<span th:text="${bill.totalTax != null ? bill.totalTax : '0.00'}">0.00</span></div>
+      <div><strong>Grand Total: ₹<span th:text="${bill.grandTotal != null ? bill.grandTotal : '0.00'}">0.00</span></strong></div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-end">
+      <a href="/bills" class="btn btn-outline-light"><i class="bi bi-arrow-left"></i> Back to Bills</a>
     </div>
   </main>
 
+  <!-- ✅ Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
     const sidebar = document.querySelector('.sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');

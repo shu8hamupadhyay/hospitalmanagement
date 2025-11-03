@@ -35,6 +35,25 @@
       overflow-y: hidden; /* Prevent body scroll */
     }
 
+.form-control {
+  background-color: #2a2d31;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary); /* White text */
+  border-radius: 8px;
+}
+
+.form-control::placeholder {
+  color: rgba(230, 237, 243, 0.7); /* Softer white for placeholder */
+}
+
+.form-control:focus {
+  background-color: #2a2d31;
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+}
+
+
     /* Sidebar Styling for fixed position and width */
     .sidebar {
       width: 250px;

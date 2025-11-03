@@ -12,84 +12,100 @@
   <link rel="stylesheet" th:href="@{/css/sidebar.css}">
 
   <style>
+    /* 🌙 Dark Glassmorphic Theme */
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #0d1117;
+      background: radial-gradient(circle at top left, #0d1117, #0a0c10 70%);
       color: #e6edf3;
       min-height: 100vh;
       margin: 0;
       overflow-x: hidden;
+      backdrop-filter: blur(10px);
     }
 
-    /* Main Content Area */
     .main-content {
-      margin-left: 260px; /* ✅ Pushes content beside sidebar */
-      flex-grow: 1;
-      overflow-y: auto;
+      margin-left: 260px;
       padding: 40px;
-      background-color: #0d1117;
       transition: margin-left 0.3s ease;
       min-height: 100vh;
     }
 
-    /* When Sidebar is Hidden (Mobile) */
     .sidebar.active + .main-content {
       margin-left: 0;
     }
 
+    /* 🩺 Form Container */
     .form-container {
-      background-color: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(56, 139, 253, 0.05);
-      max-width: 900px;
+      background: rgba(22, 27, 34, 0.9);
+      border: 1px solid rgba(240, 246, 252, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(88, 166, 255, 0.08);
+      max-width: 950px;
       margin: 0 auto;
-      padding: 35px;
+      padding: 40px;
+      backdrop-filter: blur(12px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-container:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(88, 166, 255, 0.15);
     }
 
     h2 {
       color: #58a6ff;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 30px;
+      text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
     }
 
+    /* 🧩 Inputs & Selects */
     .form-control, .form-select {
-      background-color: #0d1117;
+      background-color: #161b22 !important; /* ✅ lighter dark background */
       border: 1px solid #30363d;
-      color: #e6edf3;
+      color: #ffffff !important; /* ✅ pure white text */
+      border-radius: 8px;
       transition: all 0.3s ease;
+      box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     }
 
     .form-control::placeholder,
     .form-select option {
-      color: #9ba6b2;
+      color: #a5b1c2;
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:focus,
+    .form-select:focus {
       border-color: #58a6ff;
-      box-shadow: none;
-      background-color: #0d1117;
+      background-color: #1c2128 !important;
+      color: #ffffff;
+      box-shadow: 0 0 8px rgba(88, 166, 255, 0.5);
+      transform: scale(1.01);
     }
 
     label {
       font-weight: 500;
-      color: #e6edf3;
+      color: #c9d1d9;
     }
 
+    /* 🧠 Buttons */
     .btn {
       border-radius: 8px;
       font-weight: 600;
-      transition: 0.3s;
+      transition: all 0.3s ease;
     }
 
     .btn-success {
-      background-color: #238636;
-      border-color: #238636;
+      background: linear-gradient(145deg, #2ea043, #238636);
+      border: none;
+      color: #fff;
+      box-shadow: 0 4px 10px rgba(46, 160, 67, 0.3);
     }
 
     .btn-success:hover {
-      background-color: #2ea043;
-      border-color: #2ea043;
+      background: linear-gradient(145deg, #3fb950, #2ea043);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(63, 185, 80, 0.4);
     }
 
     .btn-secondary {
@@ -100,6 +116,7 @@
 
     .btn-secondary:hover {
       background-color: #484f58;
+      transform: translateY(-2px);
     }
 
     .btn-outline-light {
@@ -112,21 +129,39 @@
       color: #fff;
     }
 
-    /* Responsive Fix */
+    /* 🔘 Sidebar Toggle */
+    .toggle-btn {
+      background: none;
+      border: none;
+      color: #58a6ff;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .toggle-btn:hover {
+      color: #1f6feb;
+    }
+
+    /* 📱 Responsive */
     @media (max-width: 768px) {
       .main-content {
-        margin-left: 0; /* ✅ No offset when sidebar hidden */
+        margin-left: 0;
         padding: 20px;
+      }
+
+      .form-container {
+        padding: 25px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar Fragment -->
+  <!-- Sidebar -->
   <div th:replace="fragments/sidebar :: sidebar"></div>
 
-  <!-- Main Content -->
+  <!-- Main -->
   <main class="main-content">
     <div class="d-flex align-items-center mb-4">
       <button class="toggle-btn d-md-none me-3" onclick="toggleSidebar()">
@@ -139,7 +174,7 @@
     </div>
 
     <div class="form-container">
-      <form th:action="${room.id} != null ? @{/rooms/update/{id}(id=${room.id})} : @{/rooms}" 
+      <form th:action="${room.id} != null ? @{/rooms/update/{id}(id=${room.id})} : @{/rooms}"
             method="post" class="row g-4">
 
         <div class="col-md-4">
@@ -197,7 +232,6 @@
     </div>
   </main>
 
-  <!-- Sidebar Toggle Script -->
   <script>
     function toggleSidebar() {
       const sidebar = document.querySelector('.sidebar');
