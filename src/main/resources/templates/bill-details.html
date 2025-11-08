@@ -21,7 +21,6 @@
       overflow: hidden;
     }
 
-    /* Layout */
     .main-content {
       flex-grow: 1;
       overflow-y: auto;
@@ -44,7 +43,6 @@
       cursor: pointer;
     }
 
-    /* Section title */
     .section-title {
       color: #3fb950;
       font-weight: 700;
@@ -55,7 +53,6 @@
       gap: 10px;
     }
 
-    /* Cards */
     .card-section {
       background-color: #161b22;
       border: 1px solid #21262d;
@@ -71,7 +68,6 @@
       margin-bottom: 20px;
     }
 
-    /* Table */
     .table {
       color: #c9d1d9;
       border-color: #30363d;
@@ -92,7 +88,6 @@
       background-color: #21262d;
     }
 
-    /* Buttons */
     .btn-outline-light {
       border-color: #c9d1d9;
       color: #c9d1d9;
@@ -103,7 +98,15 @@
       color: #0d1117;
     }
 
-    /* Totals */
+    .btn-primary {
+      background-color: #1f6feb;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #388bfd;
+    }
+
     .totals {
       line-height: 1.8;
       font-size: 1rem;
@@ -114,7 +117,6 @@
       font-size: 1.2rem;
     }
 
-    /* Responsive */
     @media (max-width: 768px) {
       .sidebar {
         left: -270px;
@@ -140,7 +142,7 @@
 </head>
 
 <body>
-  <!-- ☰ Toggle Button -->
+  <!-- ☰ Sidebar Toggle -->
   <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-list"></i></button>
 
   <!-- ✅ Sidebar -->
@@ -154,15 +156,18 @@
     <div class="card-section">
       <h5><i class="bi bi-info-circle me-2"></i> Bill Summary</h5>
       <div class="row">
-        <div class="col-md-6 mb-2"><strong>Invoice No:</strong> <span th:text="${bill.invoiceNumber}">INV001</span></div>
-        <div class="col-md-6 mb-2"><strong>Date:</strong> 
+        <div class="col-md-6 mb-2"><strong>Invoice No:</strong> <span th:text="${bill.invoiceNumber}">INV-001</span></div>
+        <div class="col-md-6 mb-2">
+          <strong>Date:</strong>
           <span th:text="${bill.billDate != null ? #temporals.format(bill.billDate, 'yyyy-MM-dd HH:mm') : 'N/A'}">2025-11-03</span>
         </div>
-        <div class="col-md-6 mb-2"><strong>Patient:</strong> 
-          <span th:text="${bill.patient != null ? bill.patient.name : 'N/A'}">John Doe</span>
+        <div class="col-md-6 mb-2">
+          <strong>Patient:</strong>
+          <span th:text="${bill.patient != null && bill.patient.name != null ? bill.patient.name : 'N/A'}">John Doe</span>
         </div>
-        <div class="col-md-6 mb-2"><strong>Doctor:</strong> 
-          <span th:text="${bill.doctor != null ? bill.doctor.name : 'N/A'}">Dr. Smith</span>
+        <div class="col-md-6 mb-2">
+          <strong>Doctor:</strong>
+          <span th:text="${bill.doctor != null && bill.doctor.name != null ? bill.doctor.name : 'N/A'}">Dr. Smith</span>
         </div>
       </div>
     </div>
@@ -189,10 +194,10 @@
             <tr th:each="item : ${bill.items}">
               <td th:text="${item.description}">Consultation</td>
               <td th:text="${item.quantity}">1</td>
-              <td th:text="${item.unitPrice}">500</td>
-              <td th:text="${item.taxPercent}">18</td>
-              <td th:text="${item.discountPercent}">5</td>
-              <td th:text="${item.subTotal}">560.00</td>
+              <td th:text="${item.unitPrice}">300.00</td>
+              <td th:text="${item.taxPercent}">5.0</td>
+              <td th:text="${item.discountPercent}">0.0</td>
+              <td th:text="${item.subTotal}">315.00</td>
             </tr>
           </tbody>
         </table>
@@ -208,9 +213,14 @@
       <div><strong>Grand Total: ₹<span th:text="${bill.grandTotal != null ? bill.grandTotal : '0.00'}">0.00</span></strong></div>
     </div>
 
-    <!-- Back Button -->
-    <div class="text-end">
-      <a href="/bills" class="btn btn-outline-light"><i class="bi bi-arrow-left"></i> Back to Bills</a>
+    <!-- Actions -->
+    <div class="d-flex justify-content-between align-items-center">
+      <a th:href="@{/bills}" class="btn btn-outline-light">
+        <i class="bi bi-arrow-left"></i> Back to Bills
+      </a>
+      <a th:href="@{'/bills/' + ${bill.id} + '/pdf'}" class="btn btn-primary">
+        <i class="bi bi-file-earmark-pdf"></i> Download PDF
+      </a>
     </div>
   </main>
 

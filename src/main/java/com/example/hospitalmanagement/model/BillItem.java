@@ -10,54 +10,29 @@ public class BillItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String description;
-
-    @Column(nullable = false)
     private double unitPrice;
-
-    @Column(nullable = false)
     private int quantity;
-
-    @Column(nullable = false)
     private double taxPercent;
-
-    @Column(nullable = false)
     private double discountPercent;
-
-    @Column(nullable = false)
     private double subTotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bill_id", nullable = false)
+    @JoinColumn(name = "bill_id")
     private Bill bill;
 
-    // --- Constructors ---
-    public BillItem() {}
-
-    public BillItem(String description, double unitPrice, int quantity,
-                    double taxPercent, double discountPercent, Bill bill) {
-        this.description = description;
-        this.unitPrice = unitPrice;
-        this.quantity = quantity;
-        this.taxPercent = taxPercent;
-        this.discountPercent = discountPercent;
-        this.bill = bill;
-        this.subTotal = calculateItemTotal();
-    }
-
-    // --- Utility Method ---
-    public double calculateItemTotal() {
+    @PrePersist
+    @PreUpdate
+    public void computeSubTotal() {
         double base = unitPrice * quantity;
         double discount = base * (discountPercent / 100);
         double afterDiscount = base - discount;
         double tax = afterDiscount * (taxPercent / 100);
-        return afterDiscount + tax;
+        this.subTotal = afterDiscount + tax;
     }
 
-    // --- Getters and Setters ---
+    // --- Getters & Setters ---
     public Long getId() { return id; }
-
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
@@ -78,11 +53,4 @@ public class BillItem {
 
     public Bill getBill() { return bill; }
     public void setBill(Bill bill) { this.bill = bill; }
-
-    // --- Lifecycle hook ---
-    @PrePersist
-    @PreUpdate
-    public void updateSubTotal() {
-        this.subTotal = calculateItemTotal();
-    }
 }

@@ -9,7 +9,7 @@ DELETE FROM birth_report;
 DELETE FROM contact;
 DELETE FROM department;
 DELETE FROM bill_items;
-DELETE FROM bill;
+DELETE FROM bills;
 DELETE FROM appointment;
 DELETE FROM patient;
 DELETE FROM doctor;
@@ -46,7 +46,7 @@ INSERT INTO appointment (appointment_date, status, doctor_id, patient_id) VALUES
 -- ==========================================================
 -- 💳 BILLS
 -- ==========================================================
-INSERT INTO bill (
+INSERT INTO bills (
     id, invoice_number, bill_date,
     total_before_tax, total_tax, total_discount, grand_total,
     patient_id, doctor_id
@@ -146,7 +146,7 @@ INSERT INTO room_allotment (room_number, patient_name, room_type, doctor_in_char
 -- ==========================================================
 -- 🔧 RESET AUTO-INCREMENTS
 -- ==========================================================
-ALTER TABLE bill ALTER COLUMN id RESTART WITH 1005;
+ALTER TABLE bills ALTER COLUMN id RESTART WITH 1005;
 ALTER TABLE bill_items ALTER COLUMN id RESTART WITH 1009;
 ALTER TABLE patient ALTER COLUMN id RESTART WITH 1005;
 ALTER TABLE doctor ALTER COLUMN id RESTART WITH 1006;
