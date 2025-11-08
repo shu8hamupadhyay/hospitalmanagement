@@ -1,5 +1,6 @@
 package com.example.hospitalmanagement.controller;
 
+import com.example.hospitalmanagement.model.Appointment;
 import com.example.hospitalmanagement.repository.AppointmentRepository;
 import com.example.hospitalmanagement.repository.DoctorRepository;
 import com.example.hospitalmanagement.repository.PatientRepository;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 public class DashboardController {
@@ -28,27 +30,49 @@ public class DashboardController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
 
-        // Total Doctors
+        // ==========================================================
+        // 📊 1️⃣ DASHBOARD SUMMARY STATS
+        // ==========================================================
         long doctorCount = doctorRepository.count();
-
-        // Total Patients
         long patientCount = patientRepository.count();
 
-        // Appointments Today
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
         LocalDateTime endOfDay = today.plusDays(1).atStartOfDay().minusNanos(1);
-        long appointmentCount = appointmentRepository.countAppointmentsToday(startOfDay, endOfDay);
 
-        // Total Revenue (dummy value for now)
+        // Count appointments happening "today"
+        long appointmentCount = appointmentRepository.countByAppointmentDateBetween(startOfDay, endOfDay);
+
+        // Placeholder — replace with actual billing service or aggregation
         double totalRevenue = 12500.50;
 
-        // Add to model
+        // ==========================================================
+        // 🗓️ 2️⃣ APPOINTMENT LISTS
+        // ==========================================================
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime weekAgo = now.minusDays(7);
+
+        // ✅ Upcoming = any appointment after "now" (including tomorrow/future)
+        List<Appointment> upcomingAppointments =
+                appointmentRepository.findByAppointmentDateAfterOrderByAppointmentDateAsc(now);
+
+        // ✅ Recent = appointments in last 7 days (excluding today’s future)
+        List<Appointment> recentAppointments =
+                appointmentRepository.findByAppointmentDateBetweenOrderByAppointmentDateDesc(weekAgo, now);
+
+        // ==========================================================
+        // 🎯 3️⃣ ADD DATA TO MODEL
+        // ==========================================================
         model.addAttribute("doctorCount", doctorCount);
         model.addAttribute("patientCount", patientCount);
         model.addAttribute("appointmentCount", appointmentCount);
         model.addAttribute("totalRevenue", totalRevenue);
+        model.addAttribute("upcomingAppointments", upcomingAppointments);
+        model.addAttribute("recentAppointments", recentAppointments);
 
-        return "dashboard"; // Thymeleaf template
+        // ==========================================================
+        // ✅ 4️⃣ RETURN VIEW
+        // ==========================================================
+        return "dashboard";  // Thymeleaf template: templates/dashboard.html
     }
 }
