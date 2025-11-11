@@ -1,0 +1,20 @@
+# === Spring Boot Backend ===
+/backend/target/
+/backend/.mvn/
+/backend/.idea/
+/backend/.classpath
+/backend/.project
+/backend/.settings/
+
+# === Node/Next.js Frontend ===
+/frontend/node_modules/
+/frontend/.next/
+/frontend/out/
+/frontend/.env.local
+
+# === General ===
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
