@@ -1,23 +1,28 @@
-# edata4you Frontend (Next.js + Tailwind)
+# Hospital Management - React Frontend
 
-This is a starter frontend scaffold for your Hospital Management System.
-It expects a Spring Boot backend running at the URL configured in `.env.local` as `NEXT_PUBLIC_API_URL`.
+This React frontend is scaffolded to integrate with the `hospitalmanagement` Spring Boot backend.
+It includes pages and components for Login, Dashboard (role-aware), Patients, Appointments, Doctors,
+Departments, Billing & Reports, and a responsive sidebar + header.
 
 ## Quick start
 
-1. Unzip the project and `cd` into it.
-2. Run `npm install`
-3. Create `.env.local` with:
-   NEXT_PUBLIC_API_URL=http://localhost:8080
-4. Run `npm run dev`
+1. Set backend base URL in `src/config.js`
+2. Install & start:
 
-## Feature highlights included:
-- JWT-based login (stores token in localStorage)
-- Protected routes (simple client-side guard)
-- Dashboard layout with sidebar and topbar
-- Patients listing CRUD scaffold
-- Doctors & Appointments pages scaffolds
-- API service wrapper using axios
-- Tailwind CSS styling and Recharts placeholder for analytics
+```bash
+npm install
+npm start
+```
 
-Drop this into your workflow and I'll continue generating modules on demand.
+## Notes
+
+- Uses Material UI for components.
+- Axios instance at `src/services/api.js` handles base URL and auth header injection.
+- Auth uses JWT stored in localStorage (`token`). Adjust to match backend auth mechanism.
+- Endpoints used (expected) — adapt if your backend uses different URLs:
+  - `POST /auth/login` -> {username, password} returns {token, role}
+  - `GET /patients`, `POST /patients`, `PUT /patients/{id}`, `DELETE /patients/{id}`
+  - `GET /appointments`, `POST /appointments`, etc.
+  - `GET /doctors`, `GET /departments`, `GET /bills`
+
+If you want, I can adapt the frontend further after you confirm actual backend endpoint names/responses.
