@@ -1,3 +1,8 @@
+# ============================================================
+# 🏥 EData4You Hospital Management - Full Stack .gitignore
+# Spring Boot (Backend) + Next.js (Frontend)
+# ============================================================
+
 # === Spring Boot Backend ===
 /backend/target/
 /backend/.mvn/
@@ -5,16 +10,54 @@
 /backend/.classpath
 /backend/.project
 /backend/.settings/
+/backend/HELP.md
+
+# Maven Wrapper
+/backend/.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
 # === Node/Next.js Frontend ===
 /frontend/node_modules/
 /frontend/.next/
 /frontend/out/
 /frontend/.env.local
+/frontend/.env
 
-# === General ===
+# === Logs and temp ===
 *.log
 *.tmp
 *.swp
+
+# === IDE Specific ===
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+
+# System Files
 .DS_Store
 Thumbs.db
