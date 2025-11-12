@@ -1,0 +1,229 @@
+/*
+|--------------------------------------------------------------------------
+| ⚡ PROFESSIONAL DARK THEME STYLES - SIDEBAR NAVIGATION
+|--------------------------------------------------------------------------
+| A modern, high-contrast dark theme utilizing a vibrant primary accent.
+| Optimized for desktop permanent view and mobile overlay slide-out.
+|
+*/
+
+/* 🎨 CSS Variables for Theming */
+:root {
+    /* --- Colors --- */
+    --color-primary: #00c6ff; 	/* Vibrant Accent Blue/Cyan (Main Highlight) */
+    --color-primary-dark: #00a0cc; /* Darker Primary for active/focus states */
+    --color-secondary: #0a0a0a; 	/* Deep Black/Near-Black for Base Background */
+    --color-tertiary: #1b1b1b; 	/* Slightly lighter black for sections/hover */
+    --color-text-light: #f0f0f0; 	/* General light text */
+    --color-text-muted: #a0a0b0; 	/* Muted text for default links and secondary info */
+    --color-shadow: rgba(0, 0, 0, 0.85); /* Deeper, more noticeable shadow */
+
+    /* --- Spacing & Layout --- */
+    --spacing-unit: 8px;
+    --sidebar-width: 280px; 	/* Standard width for desktop */
+    --sidebar-mobile-width: 250px; /* Reduced width for mobile */
+
+    /* --- Transitions --- */
+    --transition-speed: 0.4s; 	/* Slightly slower for a more 'premium' feel */
+    --transition-bezier: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* 🌙 Sidebar Container (Desktop Default) */
+/* -------------------------------------------------- */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    /* Premium dark gradient */
+    background: linear-gradient(180deg, var(--color-secondary) 0%, #000000 100%);
+    color: var(--color-text-light);
+    display: flex;
+    flex-direction: column;
+    padding: 3rem 1.5rem; 
+    transition: all var(--transition-speed) var(--transition-bezier);
+    overflow-y: auto;
+    z-index: 1050; /* Ensure it's above content and overlay */
+    /* Refined box shadow for depth */
+    box-shadow: 6px 0 20px var(--color-shadow);
+    font-family: "Poppins", sans-serif;
+    line-height: 1.5;
+}
+
+/* 🧭 Sidebar Header */
+/* -------------------------------------------------- */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding: 0;
+}
+
+.sidebar-header h2 {
+    font-size: 1.65rem;
+    color: var(--color-primary);
+    font-weight: 800;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 4px rgba(0, 198, 255, 0.7);
+}
+
+.toggle-btn {
+    /* This button only appears on mobile due to d-md-none in HTML */
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    font-size: 1.8rem; 
+    cursor: pointer;
+    opacity: 0.9;
+    transition: color 0.2s ease, transform 0.2s ease;
+    padding: 5px; 
+}
+
+.toggle-btn:hover {
+    opacity: 1;
+    color: var(--color-primary-dark);
+    transform: scale(1.1);
+}
+
+/* 📋 Nav Links List & Items */
+/* -------------------------------------------------- */
+.sidebar nav {
+    flex-grow: 1;
+}
+
+.sidebar .nav-link {
+    color: var(--color-text-muted);
+    padding: 0.9rem 1.25rem;
+    display: flex;
+    align-items: center;
+    border-radius: 6px;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    gap: 12px;
+    transition: background-color 0.3s var(--transition-bezier), color 0.3s var(--transition-bezier), transform 0.3s var(--transition-bezier), box-shadow 0.3s ease;
+}
+
+/* 🧲 Icons beside text */
+.sidebar .nav-link i {
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    opacity: 0.8;
+    transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+/* ✨ Hover and Active States */
+/* -------------------------------------------------- */
+.sidebar .nav-link:hover {
+    background: var(--color-tertiary);
+    color: var(--color-text-light);
+    transform: translateX(3px);
+    box-shadow: 0 0 8px rgba(0, 198, 255, 0.1);
+}
+
+.sidebar .nav-link:hover i {
+    color: var(--color-primary-dark);
+    opacity: 1;
+}
+
+/* Active link gets a clear visual indicator */
+.sidebar .nav-link.active {
+    background: rgba(0, 198, 255, 0.1);
+    color: var(--color-primary);
+    border-left: 4px solid var(--color-primary);
+    /* Adjust padding to account for the 4px border */
+    padding-left: calc(1.25rem - 4px);
+    font-weight: 600;
+    transform: none;
+    box-shadow: 0 0 12px rgba(0, 198, 255, 0.3);
+}
+
+.sidebar .nav-link.active i {
+    color: var(--color-primary);
+    opacity: 1;
+}
+
+/* 🔥 Scrollbar Styling */
+/* -------------------------------------------------- */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar::-webkit-scrollbar-track {
+    background: var(--color-secondary);
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* ✅ Main Content (Used on the main pages that include the sidebar) */
+/* -------------------------------------------------- */
+.content-wrapper { /* Renamed from .main-content to match Bootstrap's convention/common practice */
+    margin-left: var(--sidebar-width); /* Space for desktop sidebar */
+    padding: 3.5rem 4rem; 
+    background-color: var(--color-secondary);
+    color: var(--color-text-light);
+    min-height: 100vh;
+    transition: margin-left var(--transition-speed) var(--transition-bezier);
+    font-family: "Poppins", sans-serif;
+}
+
+.content-wrapper h1,
+.content-wrapper h2 {
+    color: var(--color-primary);
+    text-shadow: 0 0 3px rgba(0, 198, 255, 0.4);
+    font-weight: 700;
+}
+
+/* 🍔 Mobile View (992px and below) */
+/* -------------------------------------------------- */
+@media (max-width: 991.98px) { 
+    /* The Bootstrap 'md' breakpoint is 768px. Using 992px (lg breakpoint) is common 
+       for collapsing sidebars, but for a true mobile experience, 768px (md) or 
+       lower (767.98px) is often better. I'll use 991.98px to align with your choice. */
+    .sidebar {
+        width: var(--sidebar-mobile-width); /* Use the smaller mobile width */
+        left: calc(-1 * var(--sidebar-mobile-width)); /* Initially push it off-screen */
+        padding-top: 5rem; /* Give space at the top */
+    }
+
+    .sidebar.active {
+        left: 0; /* Slide into view */
+        box-shadow: 4px 0 15px var(--color-shadow); /* Adjust shadow for mobile */
+    }
+
+    /* On mobile, remove the margin so content takes full width */
+    .content-wrapper {
+        margin-left: 0;
+        padding: 2rem 1rem; /* Adjusted mobile padding */
+    }
+
+    /* The toggle button inside the header is now the only way to close the sidebar on mobile */
+}
+
+/* 🩶 Overlay for Mobile (Crucial for professional UX) */
+/* -------------------------------------------------- */
+.sidebar-overlay {
+    display: none; /* Initially hidden, prevents blocking clicks */
+    position: fixed;
+    inset: 0; /* Shorthand for top:0; right:0; bottom:0; left:0; */
+    background: rgba(0, 0, 0, 0.0); /* Start transparent */
+    backdrop-filter: blur(0px); 
+    z-index: 1040; /* Below the sidebar (1050) */
+    /* Add transition for smooth fade-in */
+    transition: background-color var(--transition-speed) ease, backdrop-filter var(--transition-speed) ease;
+}
+
+.sidebar-overlay.active {
+    display: block;
+    background: rgba(0, 0, 0, 0.7); /* Dark, semi-transparent overlay */
+    backdrop-filter: blur(2px); /* Subtle blur */
+}

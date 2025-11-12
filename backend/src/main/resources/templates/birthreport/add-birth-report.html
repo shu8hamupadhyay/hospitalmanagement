@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${formTitle}">Add Birth Report | HMS Admin</title>
+
+  <!-- Bootstrap & Fonts -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/sidebar.css}" />
+
+  <style>
+    :root {
+      --bg-main: #0d1117;
+      --bg-card: #161b22;
+      --border-color: #30363d;
+      --text-primary: #e6edf3;
+      --text-secondary: #8b949e;
+      --accent-blue: #58a6ff;
+      --accent-green: #238636;
+      --hover-green: #2ea043;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .nav-link {
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: all 0.2s ease-in-out;
+      font-weight: 500;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background-color: var(--accent-green);
+      color: #fff;
+    }
+
+    .nav-link i {
+      font-size: 1.2rem;
+    }
+
+    /* Toggle Button */
+    .toggle-btn {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 26px;
+      z-index: 1100;
+      cursor: pointer;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 40px;
+      margin-left: 260px;
+      transition: margin-left 0.3s ease;
+      background-color: var(--bg-main);
+    }
+
+    h2 {
+      color: var(--accent-blue);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .form-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(56, 139, 253, 0.05);
+      transition: 0.3s ease;
+    }
+
+    .form-card:hover {
+      box-shadow: 0 0 25px rgba(88, 166, 255, 0.15);
+    }
+
+    label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .form-control,
+    .form-select,
+    textarea {
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    textarea:focus {
+      border-color: var(--accent-blue);
+      box-shadow: none;
+    }
+
+    .btn-success {
+      background-color: var(--accent-green);
+      border: none;
+      transition: 0.3s;
+    }
+
+    .btn-success:hover {
+      background-color: var(--hover-green);
+    }
+
+    .btn-back {
+      background-color: #21262d;
+      color: var(--accent-blue);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+    }
+
+    .btn-back:hover {
+      background-color: #30363d;
+      color: #79c0ff;
+      text-decoration: none;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        left: -270px;
+      }
+
+      .sidebar.active {
+        left: 0;
+      }
+
+      .toggle-btn {
+        display: block;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding-top: 60px;
+      }
+
+      body.sidebar-open {
+        overflow: hidden;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar Toggle Button -->
+  <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-list"></i></button>
+
+  <!-- Sidebar Fragment -->
+  <div th:replace="fragments/sidebar :: sidebar"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="mb-3">
+      <a th:href="@{/birth-reports}" class="btn-back">
+        <i class="bi bi-arrow-left"></i> Back to Birth Reports
+      </a>
+    </div>
+
+    <div class="form-card">
+      <h2 th:text="${formTitle}">Add Birth Report</h2>
+
+      <form th:action="@{${formAction}}" th:object="${birthReport}" method="post">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label>Baby Name</label>
+            <input type="text" class="form-control" th:field="*{babyName}" required>
+          </div>
+
+          <div class="col-md-6">
+            <label>Mother Name</label>
+            <input type="text" class="form-control" th:field="*{motherName}" required>
+          </div>
+
+          <div class="col-md-6">
+            <label>Father Name</label>
+            <input type="text" class="form-control" th:field="*{fatherName}">
+          </div>
+
+          <div class="col-md-6">
+            <label>Gender</label>
+            <select class="form-select" th:field="*{gender}" required>
+              <option value="" disabled selected>Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label>Birth Date & Time</label>
+            <input type="datetime-local" class="form-control" th:field="*{birthDateTime}" required>
+          </div>
+
+          <div class="col-md-6">
+            <label>Doctor Name</label>
+            <input type="text" class="form-control" th:field="*{doctorName}" required>
+          </div>
+
+          <div class="col-12">
+            <label>Remarks</label>
+            <textarea class="form-control" rows="3" th:field="*{remarks}"></textarea>
+          </div>
+
+          <div class="col-12 d-flex justify-content-between mt-4">
+            <a th:href="@{/birth-reports}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-success">Save Report</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const body = document.body;
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+      body.classList.toggle('sidebar-open');
+    });
+  </script>
+</body>
+</html>
