@@ -1,15 +1,22 @@
 package com.example.hospitalmanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(
     name = "appointments",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"serial_no"})
-    }
+    uniqueConstraints = @UniqueConstraint(columnNames = {"serial_no"})
 )
+
+// Prevent Hibernate Lazy loading errors
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
+// Prevent infinite recursion (works with Patient & Doctor)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Appointment {
 
     @Id
@@ -17,47 +24,46 @@ public class Appointment {
     private Long id;
 
     // ==========================================================
-    // 🔗 RELATIONSHIPS
+    // RELATIONS (All LAZY, identity-based JSON handling)
     // ==========================================================
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
+    @JsonIgnoreProperties({"doctors", "appointments"})
     private Department department;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
+    @JsonIgnoreProperties({"appointments", "department"})
     private Doctor doctor;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
+    @JsonIgnoreProperties({"appointments", "doctor"})
     private Patient patient;
 
     // ==========================================================
-    // 📅 APPOINTMENT DETAILS
+    // DETAILS
     // ==========================================================
+
     @Column(name = "appointment_date", nullable = false)
     private LocalDateTime appointmentDate;
 
     @Column(name = "serial_no", nullable = false, unique = true, length = 20)
-    private String serialNo;  // Example: "CAR-005"
+    private String serialNo;
 
     @Column(length = 255)
-    private String problem;   // Patient’s main issue
+    private String problem;
 
     @Column(length = 30)
-    private String status;    // Active, Completed, Cancelled, etc.
+    private String status;
 
     @Column(length = 500)
-    private String remarks;   // Optional notes for admin/doctor
+    private String remarks;
 
-    // ==========================================================
-    // 💰 FEE / CHARGES
-    // ==========================================================
     @Column(name = "fee")
-    private Double fee = 0.0; // Optional; used for billing/revenue stats
+    private Double fee = 0.0;
 
-    // ==========================================================
-    // 🕒 SYSTEM FIELDS
-    // ==========================================================
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -67,93 +73,56 @@ public class Appointment {
     }
 
     // ==========================================================
-    // 🧩 GETTERS & SETTERS
+    // GETTERS & SETTERS
     // ==========================================================
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public Department getDepartment() {
-        return department;
-    }
+    public Department getDepartment() { return department; }
+    public void setDepartment(Department department) { this.department = department; }
 
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
+    public Doctor getDoctor() { return doctor; }
+    public void setDoctor(Doctor doctor) { this.doctor = doctor; }
 
-    public Doctor getDoctor() {
-        return doctor;
-    }
+    public Patient getPatient() { return patient; }
+    public void setPatient(Patient patient) { this.patient = patient; }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
+    public LocalDateTime getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(LocalDateTime appointmentDate) { this.appointmentDate = appointmentDate; }
 
-    public Patient getPatient() {
-        return patient;
-    }
+    public String getSerialNo() { return serialNo; }
+    public void setSerialNo(String serialNo) { this.serialNo = serialNo; }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
+    public String getProblem() { return problem; }
+    public void setProblem(String problem) { this.problem = problem; }
 
-    public LocalDateTime getAppointmentDate() {
-        return appointmentDate;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setAppointmentDate(LocalDateTime appointmentDate) {
-        this.appointmentDate = appointmentDate;
-    }
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
 
-    public String getSerialNo() {
-        return serialNo;
-    }
+    public Double getFee() { return fee; }
+    public void setFee(Double fee) { this.fee = fee; }
 
-    public void setSerialNo(String serialNo) {
-        this.serialNo = serialNo;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public String getProblem() {
-        return problem;
-    }
+    // ==========================================================
+    // toString()
+    // ==========================================================
 
-    public void setProblem(String problem) {
-        this.problem = problem;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getRemarks() {
-        return remarks;
-    }
-
-    public void setRemarks(String remarks) {
-        this.remarks = remarks;
-    }
-
-    public Double getFee() {
-        return fee;
-    }
-
-    public void setFee(Double fee) {
-        this.fee = fee;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    @Override
+    public String toString() {
+        return "Appointment{" +
+                "id=" + id +
+                ", serialNo='" + serialNo + '\'' +
+                ", doctor=" + (doctor != null ? doctor.getName() : "N/A") +
+                ", department=" + (department != null ? department.getName() : "N/A") +
+                ", patient=" + (patient != null ? patient.getName() : "N/A") +
+                ", appointmentDate=" + appointmentDate +
+                ", status='" + status + '\'' +
+                '}';
     }
 }

@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+html, body, #__next { height: 100%; }
+body { @apply bg-slate-100 text-slate-900; }
+.input-dark {
+  width: 100%;
+  padding: 10px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: white;
+}
+
+.input-dark:focus {
+  border-color: #38bdf8;
+  outline: none;
+}

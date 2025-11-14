@@ -1,31 +1,15 @@
 package com.example.hospitalmanagement.service;
 
 import com.example.hospitalmanagement.model.Department;
-import com.example.hospitalmanagement.repository.DepartmentRepository;
-import org.springframework.stereotype.Service;
 import java.util.List;
 
-@Service
-public class DepartmentService {
-    private final DepartmentRepository departmentRepository;
+public interface DepartmentService {
 
-    public DepartmentService(DepartmentRepository departmentRepository) {
-        this.departmentRepository = departmentRepository;
-    }
+    List<Department> getAllDepartments();
 
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
-    }
+    Department getDepartmentById(Long id);
 
-    public Department getDepartmentById(Long id) {
-        return departmentRepository.findById(id).orElse(null);
-    }
+    Department saveDepartment(Department department);  // MUST return Department
 
-    public void saveDepartment(Department department) {
-        departmentRepository.save(department);
-    }
-
-    public void deleteDepartment(Long id) {
-        departmentRepository.deleteById(id);
-    }
+    void deleteDepartment(Long id);
 }

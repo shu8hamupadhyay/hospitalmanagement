@@ -1,18 +1,31 @@
 package com.example.hospitalmanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "department")
+
+// Prevent Hibernate Lazy errors
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
+// Prevent infinite recursion using ID references
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Department {
 
+    // ==========================================================
+    // PRIMARY KEY
+    // ==========================================================
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     // ==========================================================
-    // 🏥 Department Details
+    // DETAILS
     // ==========================================================
     @Column(nullable = false, unique = true, length = 100)
     private String name;
@@ -23,30 +36,32 @@ public class Department {
     @Column(name = "staff_count")
     private int staffCount;
 
-    @Column(name = "services_offered")
-    private int servicesOffered;
+    @Column(name = "services_offered", length = 255)
+    private String servicesOffered;
 
     @Column(length = 20)
     private String status; // Active / Inactive
 
     // ==========================================================
-    // 🔗 Relationships
+    // RELATIONSHIPS
     // ==========================================================
 
-    // One department can have many doctors
+    // One Department → Many Doctors
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Doctor> doctors;
 
-    // One department can have many appointments
+    // One Department → Many Appointments
+    // Not needed by UI → ignore to prevent recursion loops
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Appointment> appointments;
 
     // ==========================================================
-    // 🏗 Constructors
+    // CONSTRUCTORS
     // ==========================================================
     public Department() {}
 
-    public Department(String name, String head, int staffCount, int servicesOffered, String status) {
+    public Department(String name, String head, int staffCount, String servicesOffered, String status) {
         this.name = name;
         this.head = head;
         this.staffCount = staffCount;
@@ -55,74 +70,34 @@ public class Department {
     }
 
     // ==========================================================
-    // 🧩 Getters and Setters
+    // GETTERS & SETTERS
     // ==========================================================
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getHead() { return head; }
+    public void setHead(String head) { this.head = head; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public int getStaffCount() { return staffCount; }
+    public void setStaffCount(int staffCount) { this.staffCount = staffCount; }
 
-    public String getHead() {
-        return head;
-    }
+    public String getServicesOffered() { return servicesOffered; }
+    public void setServicesOffered(String servicesOffered) { this.servicesOffered = servicesOffered; }
 
-    public void setHead(String head) {
-        this.head = head;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public int getStaffCount() {
-        return staffCount;
-    }
+    public List<Doctor> getDoctors() { return doctors; }
+    public void setDoctors(List<Doctor> doctors) { this.doctors = doctors; }
 
-    public void setStaffCount(int staffCount) {
-        this.staffCount = staffCount;
-    }
-
-    public int getServicesOffered() {
-        return servicesOffered;
-    }
-
-    public void setServicesOffered(int servicesOffered) {
-        this.servicesOffered = servicesOffered;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public List<Doctor> getDoctors() {
-        return doctors;
-    }
-
-    public void setDoctors(List<Doctor> doctors) {
-        this.doctors = doctors;
-    }
-
-    public List<Appointment> getAppointments() {
-        return appointments;
-    }
-
-    public void setAppointments(List<Appointment> appointments) {
-        this.appointments = appointments;
-    }
+    public List<Appointment> getAppointments() { return appointments; }
+    public void setAppointments(List<Appointment> appointments) { this.appointments = appointments; }
 
     // ==========================================================
-    // 🧠 Utility
+    // UTILITY
     // ==========================================================
     @Override
     public String toString() {

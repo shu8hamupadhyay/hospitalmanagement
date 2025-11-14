@@ -18,11 +18,11 @@
 !**/src/test/**/target/
 
 # === Node/Next.js Frontend ===
-/frontend/node_modules/
-/frontend/.next/
-/frontend/out/
-/frontend/.env.local
-/frontend/.env
+/frontend_next/node_modules/
+/frontend_next/.next/
+/frontend_next/out/
+/frontend_next/.env.local
+/frontend_next/.env
 
 # === Logs and temp ===
 *.log

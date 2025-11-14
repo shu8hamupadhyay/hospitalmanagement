@@ -1,19 +1,25 @@
 package com.example.hospitalmanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "doctor")
+
+// Hide Hibernate proxy fields
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+
+// Prevent infinite JSON recursion with object IDs
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Doctor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // ==========================================================
-    // 👩‍⚕️ Doctor Details
-    // ==========================================================
     @Column(nullable = false, length = 100)
     private String name;
 
@@ -29,22 +35,17 @@ public class Doctor {
     @Column(length = 100)
     private String specialization;
 
-    // ==========================================================
-    // 🔗 Relationship with Department (Optional)
-    // ==========================================================
+    // Many doctors → one department
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
+    @JsonIgnoreProperties({"doctors", "appointments"}) // prevent loops
     private Department department;
 
-    // ==========================================================
-    // 🔗 Relationship with Appointments
-    // ==========================================================
+    // One doctor → many appointments
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"doctor", "patient", "department"}) // prevent loops
     private List<Appointment> appointments;
 
-    // ==========================================================
-    // 🏗️ Constructors
-    // ==========================================================
     public Doctor() {}
 
     public Doctor(String name, String email, String phone, String qualification, String specialization) {
@@ -55,78 +56,33 @@ public class Doctor {
         this.specialization = specialization;
     }
 
-    // ==========================================================
-    // 🧩 Getters & Setters
-    // ==========================================================
-    public Long getId() {
-        return id;
-    }
+    // Getters & Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getQualification() { return qualification; }
+    public void setQualification(String qualification) { this.qualification = qualification; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public String getSpecialization() { return specialization; }
+    public void setSpecialization(String specialization) { this.specialization = specialization; }
 
-    public String getPhone() {
-        return phone;
-    }
+    public Department getDepartment() { return department; }
+    public void setDepartment(Department department) { this.department = department; }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public List<Appointment> getAppointments() { return appointments; }
+    public void setAppointments(List<Appointment> appointments) { this.appointments = appointments; }
 
-    public String getQualification() {
-        return qualification;
-    }
-
-    public void setQualification(String qualification) {
-        this.qualification = qualification;
-    }
-
-    public String getSpecialization() {
-        return specialization;
-    }
-
-    public void setSpecialization(String specialization) {
-        this.specialization = specialization;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public List<Appointment> getAppointments() {
-        return appointments;
-    }
-
-    public void setAppointments(List<Appointment> appointments) {
-        this.appointments = appointments;
-    }
-
-    // ==========================================================
-    // 🧠 Utility Methods
-    // ==========================================================
     @Override
     public String toString() {
-        return name + " (" + specialization + ")";
+        return "Doctor{id=" + id + ", name='" + name + "'}";
     }
 }
