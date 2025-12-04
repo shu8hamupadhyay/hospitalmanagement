@@ -1,5 +1,8 @@
 package com.example.hospitalmanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -7,6 +10,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "bills")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Bill {
 
     @Id
@@ -17,10 +25,12 @@ public class Bill {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
+    @JsonIgnoreProperties({"appointments", "doctor"})
     private Patient patient;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id")
+    @JsonIgnoreProperties({"patients", "appointments"})
     private Doctor doctor;
 
     private LocalDateTime billDate = LocalDateTime.now();
@@ -30,46 +40,69 @@ public class Bill {
     private double totalDiscount;
     private double grandTotal;
 
-    @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "bill",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnoreProperties({"bill"})   // VERY IMPORTANT
     private List<BillItem> items = new ArrayList<>();
 
-    public Bill() {
-        this.invoiceNumber = "INV-" + System.currentTimeMillis();
-    }
 
+    public Bill() {}
+
+
+    // -------------------------------------------------------------
+    // Calculate totals before save/update
+    // -------------------------------------------------------------
     @PrePersist
     @PreUpdate
     public void calculateTotals() {
-        double subtotal = 0.0, totalTaxVal = 0.0, totalDiscVal = 0.0;
+        double subtotal = 0;
+        double discountTotal = 0;
+        double taxTotal = 0;
 
         for (BillItem item : items) {
+
+            item.setBill(this); // REQUIRED
+
             double base = item.getUnitPrice() * item.getQuantity();
             double discount = base * (item.getDiscountPercent() / 100);
-            double afterDisc = base - discount;
-            double tax = afterDisc * (item.getTaxPercent() / 100);
-            double itemTotal = afterDisc + tax;
+            double afterDiscount = base - discount;
+            double tax = afterDiscount * (item.getTaxPercent() / 100);
+
+            double total = afterDiscount + tax;
 
             subtotal += base;
-            totalTaxVal += tax;
-            totalDiscVal += discount;
-            item.setSubTotal(itemTotal);
-            item.setBill(this);
+            discountTotal += discount;
+            taxTotal += tax;
+
+            item.setSubTotal(total);
         }
 
         this.totalBeforeTax = subtotal;
-        this.totalDiscount = totalDiscVal;
-        this.totalTax = totalTaxVal;
-        this.grandTotal = subtotal - totalDiscVal + totalTaxVal;
+        this.totalDiscount = discountTotal;
+        this.totalTax = taxTotal;
+        this.grandTotal = subtotal - discountTotal + taxTotal;
     }
 
+
+    // -------------------------------------------------------------
+    // Add item utility
+    // -------------------------------------------------------------
     public void addItem(BillItem item) {
         item.setBill(this);
         this.items.add(item);
     }
 
-    // --- Getters & Setters ---
+
+    // -------------------------------------------------------------
+    // Getters + Setters
+    // -------------------------------------------------------------
     public Long getId() { return id; }
+
     public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
 
     public Patient getPatient() { return patient; }
     public void setPatient(Patient patient) { this.patient = patient; }
@@ -85,16 +118,14 @@ public class Bill {
     public double getTotalDiscount() { return totalDiscount; }
     public double getGrandTotal() { return grandTotal; }
 
+    public void setGrandTotal(double grandTotal) { this.grandTotal = grandTotal; }
+
     public List<BillItem> getItems() { return items; }
+
     public void setItems(List<BillItem> items) {
         this.items.clear();
-        if (items != null) items.forEach(this::addItem);
+        if (items != null) {
+            items.forEach(this::addItem);  // ensures bill is set properly
+        }
     }
-    public void setInvoiceNumber(String invoiceNumber) {
-    this.invoiceNumber = invoiceNumber;
-}
-
-public void setGrandTotal(double grandTotal) {
-    this.grandTotal = grandTotal;
-}
 }

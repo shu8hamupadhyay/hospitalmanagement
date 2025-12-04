@@ -25,7 +25,7 @@ export default function Layout({ children, active = "dashboard" }) {
             active={active === "dashboard"}
           />
 
-          {/* Patients (NOW DROPDOWN LIKE DEPARTMENTS + DOCTORS) */}
+          {/* Patients */}
           <NavGroup
             label="Patients"
             icon="🧍‍♂️"
@@ -36,16 +36,6 @@ export default function Layout({ children, active = "dashboard" }) {
             ]}
           />
 
-          {/* Departments */}
-          <NavGroup
-            label="Departments"
-            icon="🏥"
-            isActiveGroup={active.startsWith("departments")}
-            items={[
-              { href: "/departments", label: "All Departments" },
-              { href: "/departments/add", label: "Add Department" },
-            ]}
-          />
 
           {/* Doctors */}
           <NavGroup
@@ -55,6 +45,41 @@ export default function Layout({ children, active = "dashboard" }) {
             items={[
               { href: "/doctors", label: "All Doctors" },
               { href: "/doctors/add", label: "Add Doctor" },
+            ]}
+          />
+
+
+
+          {/* Bills */}
+          <NavGroup
+            label="Bills"
+            icon="🧾"
+            isActiveGroup={active.startsWith("bills")}
+            items={[
+              { href: "/bills", label: "All Bills" },
+              { href: "/bills/add", label: "Create Bill" },
+            ]}
+          />
+
+
+          {/* Appointments */}
+          <NavGroup
+            label="Appointments"
+            icon="📅"
+            isActiveGroup={active.startsWith("appointments")}
+            items={[
+              { href: "/appointments", label: "All Appointments" },
+              { href: "/appointments/add", label: "Add Appointment" },
+            ]}
+          />
+          {/* Departments */}
+          <NavGroup
+            label="Departments"
+            icon="🏥"
+            isActiveGroup={active.startsWith("departments")}
+            items={[
+              { href: "/departments", label: "All Departments" },
+              { href: "/departments/add", label: "Add Department" },
             ]}
           />
 
@@ -68,6 +93,73 @@ export default function Layout({ children, active = "dashboard" }) {
               { href: "/deathreports/add", label: "Add New Report" },
             ]}
           />
+
+          {/* ⭐⭐ NEW — Lab Reports ⭐⭐ */}
+          <NavGroup
+            label="Lab Reports"
+            icon="🧪"
+            isActiveGroup={active.startsWith("labreports")}
+            items={[
+              { href: "/labreports", label: "All Lab Reports" },
+              { href: "/labreports/add", label: "Add Lab Report" },
+            ]}
+          />
+
+          {/* Pharmacy */}
+          <NavGroup
+            label="Pharmacy"
+            icon="💊"
+            isActiveGroup={active.startsWith("pharmacy")}
+            items={[
+              { href: "/pharmacy", label: "All Medicines" },
+              { href: "/pharmacy/add", label: "Add Medicine" },
+            ]}
+          />
+
+          {/* Prescriptions */}
+          <NavGroup
+            label="Prescriptions"
+            icon="📝"
+            isActiveGroup={active.startsWith("prescriptions")}
+            items={[
+              { href: "/prescriptions", label: "All Prescriptions" },
+              { href: "/prescriptions/add", label: "Add Prescription" },
+            ]}
+          />
+
+          {/* Contacts */}
+          <NavGroup
+            label="Contacts"
+            icon="📞"
+            isActiveGroup={active.startsWith("contacts")}
+            items={[
+              { href: "/contacts", label: "All Contacts" },
+              { href: "/contacts/add", label: "Add Contact" },
+            ]}
+          />
+
+          {/* Birth Reports */}
+          <NavGroup
+            label="Birth Reports"
+            icon="👶"
+            isActiveGroup={active.startsWith("birthreports")}
+            items={[
+              { href: "/birthreports", label: "All Reports" },
+              { href: "/birthreports/add", label: "Add Birth Report" },
+            ]}
+          />
+
+          {/* Room Allotment */}
+          <NavGroup
+            label="Room Allotment"
+            icon="🛏️"
+            isActiveGroup={active.startsWith("roomallotments")}
+            items={[
+              { href: "/roomallotments", label: "All Rooms" },
+              { href: "/roomallotments/add", label: "Allot Room" },
+            ]}
+          />
+
 
         </nav>
       </aside>

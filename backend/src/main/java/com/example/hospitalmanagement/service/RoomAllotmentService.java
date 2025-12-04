@@ -20,4 +20,8 @@ public class RoomAllotmentService {
     public RoomAllotment getRoomAllotmentById(Long id) {
         return repository.findById(id).orElse(null);
     }
+
+    public RoomAllotment saveRoomAllotment(RoomAllotment roomAllotment) {
+        return repository.save(roomAllotment);
+    }
 }

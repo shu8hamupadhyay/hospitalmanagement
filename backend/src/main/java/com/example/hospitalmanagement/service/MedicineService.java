@@ -3,10 +3,12 @@ package com.example.hospitalmanagement.service;
 import com.example.hospitalmanagement.model.Medicine;
 import com.example.hospitalmanagement.repository.MedicineRepository;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class MedicineService {
+
     private final MedicineRepository medicineRepository;
 
     public MedicineService(MedicineRepository medicineRepository) {
@@ -21,8 +23,8 @@ public class MedicineService {
         return medicineRepository.findById(id).orElse(null);
     }
 
-    public void saveMedicine(Medicine medicine) {
-        medicineRepository.save(medicine);
+    public Medicine saveMedicine(Medicine medicine) {
+        return medicineRepository.save(medicine);
     }
 
     public void deleteMedicine(Long id) {

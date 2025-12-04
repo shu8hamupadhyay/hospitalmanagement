@@ -1,59 +1,67 @@
 package com.example.hospitalmanagement.controller;
 
-import com.example.hospitalmanagement.model.Doctor;
-import com.example.hospitalmanagement.repository.DoctorRepository;
+import com.example.hospitalmanagement.dto.DoctorDTO;
+import com.example.hospitalmanagement.service.DoctorApiService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/doctors")
-@CrossOrigin(origins = "*") // allows React (localhost:3000) to access it
+@CrossOrigin(origins = "*")
 public class DoctorRestController {
 
-    private final DoctorRepository doctorRepository;
+    private final DoctorApiService doctorService;
 
-    public DoctorRestController(DoctorRepository doctorRepository) {
-        this.doctorRepository = doctorRepository;
+    public DoctorRestController(DoctorApiService doctorService) {
+        this.doctorService = doctorService;
     }
 
-    // Get all doctors
+    // ==========================================================
+    // GET ALL — returns DTO list
+    // ==========================================================
     @GetMapping
-    public List<Doctor> getAll() {
-        return doctorRepository.findAll();
+    public List<DoctorDTO> getAll() {
+        return doctorService.getAllDoctors();
     }
 
-    // Get a single doctor by ID
+    // ==========================================================
+    // GET ONE — returns DTO
+    // ==========================================================
     @GetMapping("/{id}")
-    public Doctor getOne(@PathVariable Long id) {
-        return doctorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id " + id));
+    public DoctorDTO getOne(@PathVariable Long id) {
+        return doctorService.getDoctorById(id);
     }
 
-    // Create a new doctor
+    // ==========================================================
+    // CREATE — accepts DTO, returns DTO
+    // ==========================================================
     @PostMapping
-    public Doctor create(@RequestBody Doctor doctor) {
-        return doctorRepository.save(doctor);
+    public DoctorDTO create(@RequestBody DoctorDTO doctorDTO) {
+        return doctorService.createDoctor(doctorDTO);
     }
 
-    // Update an existing doctor
+    // ==========================================================
+    // UPDATE — accepts DTO, returns DTO
+    // ==========================================================
     @PutMapping("/{id}")
-    public Doctor update(@PathVariable Long id, @RequestBody Doctor updatedDoctor) {
-        Doctor existing = doctorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id " + id));
-
-        existing.setName(updatedDoctor.getName());
-        existing.setEmail(updatedDoctor.getEmail());
-        existing.setPhone(updatedDoctor.getPhone());
-        existing.setQualification(updatedDoctor.getQualification());
-        existing.setSpecialization(updatedDoctor.getSpecialization());
-
-        return doctorRepository.save(existing);
+    public DoctorDTO update(@PathVariable Long id, @RequestBody DoctorDTO doctorDTO) {
+        return doctorService.updateDoctor(id, doctorDTO);
     }
 
-    // Delete a doctor
+    // ==========================================================
+    // DELETE
+    // ==========================================================
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        doctorRepository.deleteById(id);
+        doctorService.deleteDoctor(id);
+    }
+
+    // ==========================================================
+    // GET BY DEPARTMENT — DTO list
+    // ==========================================================
+    @GetMapping("/by-department/{deptId}")
+    public List<DoctorDTO> getByDepartment(@PathVariable Long deptId) {
+        return doctorService.getDoctorsByDepartment(deptId);
     }
 }

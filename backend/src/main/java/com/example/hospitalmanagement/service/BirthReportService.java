@@ -22,7 +22,11 @@ public class BirthReportService {
         return birthReportRepository.findById(id).orElse(null);
     }
 
-    public void saveBirthReport(BirthReport report) {
-        birthReportRepository.save(report);
+    public BirthReport saveBirthReport(BirthReport report) {
+        return birthReportRepository.save(report);
+    }
+
+    public void deleteBirthReport(Long id) {
+        birthReportRepository.deleteById(id);
     }
 }

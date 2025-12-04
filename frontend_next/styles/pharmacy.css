@@ -1,0 +1,114 @@
+/* ================================
+   GLOBAL
+================================ */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0f0f0f;
+  color: #e5e5e5;
+  margin: 0;
+  padding: 0;
+}
+
+/* ================================
+   SIDEBAR
+================================ */
+.sidebar {
+  width: 260px;
+  background-color: #161616;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 20px;
+  border-right: 1px solid #222222;
+  color: #eaeaea;
+}
+
+/* ================================
+   MAIN CONTENT
+================================ */
+.main-content {
+  margin-left: 260px;
+  padding: 40px;
+  background-color: #121212;
+  min-height: 100vh;
+}
+
+/* ================================
+   CARD
+================================ */
+.card-dark {
+  background-color: #1c1f25;
+  border: 1px solid #2b3038;
+  border-radius: 12px;
+  padding: 20px;
+  color: #f5f5f5;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ================================
+   FORM
+================================ */
+.form-control {
+  background-color: #23262d !important;
+  color: #ffffff !important;
+  border: 1px solid #343942 !important;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  border-color: #00e5ff !important;
+  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.3);
+}
+
+/* ================================
+   BUTTONS
+================================ */
+.btn-primary {
+  background-color: #00e5ff !important;
+  border-color: #00e5ff !important;
+  color: #000 !important;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 16px;
+  transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #00c8e0 !important;
+  border-color: #00c8e0 !important;
+}
+
+/* ================================
+   TABLE HEADER
+================================ */
+.table-dark-header {
+  background-color: #171717;
+  border-bottom: 2px solid #00e5ff;
+  color: #eaeaea;
+  font-weight: 600;
+}
+
+/* ================================
+   LINKS
+================================ */
+a {
+  color: #00e5ff;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #00c8e0;
+}
+
+/* ================================
+   BADGES / TAGS
+================================ */
+.badge-info {
+  background-color: #00e5ff;
+  color: #000;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+}

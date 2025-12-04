@@ -1,104 +1,309 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../../components/Layout";
+import SearchableSelect from "../../components/SearchableSelect";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import {
+  Save,
+  ArrowLeft,
+  AlertTriangle,
+  Loader2,
+  Heart,
+  User,
+  Stethoscope,
+  Calendar,
+  FileText,
+  MapPin,
+} from "lucide-react";
 
 export default function AddDeathReportPage() {
+  const router = useRouter();
   const API = "http://localhost:8080/api/death-reports";
 
+  const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const [form, setForm] = useState({
-    patientName: "",
+    patientId: "",
+    doctorId: "",
     gender: "",
     ward: "",
     causeOfDeath: "",
-    doctorName: "",
     dateOfDeath: "",
     remarks: "",
   });
 
-  const update = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const label = "block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5";
+  const input =
+    "w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-slate-600";
+  const textarea =
+    "w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-slate-600 resize-vertical";
+  const sectionClass = "bg-slate-900/50 backdrop-blur-sm border border-slate-800 p-6 md:p-8 rounded-xl shadow-lg";
 
+  // Load patients & doctors
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const [pRes, dRes] = await Promise.all([
+          fetch("http://localhost:8080/api/patients"),
+          fetch("http://localhost:8080/api/doctors"),
+        ]);
+
+        if (!pRes.ok || !dRes.ok) throw new Error("Failed to load data");
+
+        const pData = await pRes.json();
+        const dData = await dRes.json();
+
+        setPatients(Array.isArray(pData) ? pData : []);
+        setDoctors(Array.isArray(dData) ? dData : []);
+      } catch (e) {
+        console.error("Failed to load lists:", e);
+        setError("Failed to load patients and doctors");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const update = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+  };
+
+  // SAVE REPORT (use DTO with IDs)
   const save = async (e) => {
     e.preventDefault();
+    setSaving(true);
+    setError("");
 
-    const res = await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    // Validate required fields
+    if (!form.patientId || !form.doctorId || !form.causeOfDeath || !form.gender || !form.dateOfDeath) {
+      setError("Please fill in all required fields");
+      setSaving(false);
+      return;
+    }
 
-    if (res.ok) {
-      window.location.href = "/deathreports";
+    try {
+      const payload = {
+        patientId: Number(form.patientId),
+        doctorId: Number(form.doctorId),
+        gender: form.gender,
+        ward: form.ward || null,
+        causeOfDeath: form.causeOfDeath,
+        dateOfDeath: form.dateOfDeath,
+        remarks: form.remarks || null,
+      };
+
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to save report");
+      }
+
+      setSuccess("Death report created successfully!");
+      setTimeout(() => {
+        router.push("/deathreports");
+      }, 1500);
+    } catch (err) {
+      console.error("Error:", err);
+      setError(err.message || "Failed to save death report");
+      setSaving(false);
     }
   };
 
+  if (loading) {
+    return (
+      <Layout active="deathreports">
+        <div className="p-6 flex items-center justify-center min-h-screen">
+          <Loader2 className="w-8 h-8 text-blue-500 animate-spin mr-3" />
+          <span className="text-slate-400">Loading form data...</span>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout active="deathreports">
-      <div className="p-4 max-w-2xl mx-auto">
-        <h2 className="text-xl font-bold mb-4">Add Death Report</h2>
+      <div className="p-6 md:p-10 text-white min-h-screen">
+        <div className="max-w-5xl mx-auto space-y-8">
+          
+          {/* HEADER */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-white tracking-tight">Add Death Report</h1>
+              <p className="text-slate-400 mt-1">Record a patient death with complete details</p>
+            </div>
+            <div className="flex gap-3">
+              <Link href="/deathreports" className="px-5 py-2.5 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 transition-colors text-sm font-medium">
+                Cancel
+              </Link>
+              <button 
+                type="submit"
+                form="deathReportForm"
+                disabled={saving}
+                className={`flex items-center px-6 py-2.5 rounded-lg text-white font-medium shadow-lg shadow-blue-900/20 transition-all text-sm
+                  ${saving ? 'bg-blue-800 cursor-wait' : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Report
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
 
-        <form className="bg-white rounded shadow p-6 space-y-4" onSubmit={save}>
-          <input
-            name="patientName"
-            placeholder="Patient Name"
-            className="input"
-            onChange={update}
-            required
-          />
+          {/* ERROR ALERT */}
+          {error && (
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <span className="text-red-400">{error}</span>
+            </div>
+          )}
 
-          <select name="gender" className="input" onChange={update}>
-            <option value="">Select Gender</option>
-            <option>Male</option>
-            <option>Female</option>
-            <option>Other</option>
-          </select>
+          {/* SUCCESS ALERT */}
+          {success && (
+            <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex gap-3">
+              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-white text-sm flex-shrink-0 flex-shrink-0">
+                ✓
+              </div>
+              <span className="text-green-400">{success}</span>
+            </div>
+          )}
 
-          <input
-            name="ward"
-            placeholder="Ward"
-            className="input"
-            onChange={update}
-          />
+          {/* FORM */}
+          <form id="deathReportForm" onSubmit={save} className="space-y-8">
+          {/* PATIENT & DOCTOR SECTION */}
+          <section className={sectionClass}>
+            <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-4">
+              <User className="w-5 h-5 text-blue-500" />
+              Patient & Doctor Information
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Patient */}
+              <SearchableSelect
+                label="Patient"
+                value={form.patientId}
+                onChange={(val) => setForm({...form, patientId: val})}
+                options={patients}
+                placeholder="Select a patient..."
+                getOptionLabel={(p) => `${p.name} (ID: ${p.id})`}
+                required
+              />
 
-          <input
-            name="causeOfDeath"
-            placeholder="Cause of Death"
-            className="input"
-            onChange={update}
-            required
-          />
+              {/* Gender */}
+              <div>
+                <label className={label}>Gender *</label>
+                <select
+                  name="gender"
+                  className={input}
+                  value={form.gender}
+                  onChange={update}
+                  required
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
 
-          <input
-            name="doctorName"
-            placeholder="Doctor Name"
-            className="input"
-            onChange={update}
-            required
-          />
+              {/* Doctor */}
+              <SearchableSelect
+                label="Doctor"
+                value={form.doctorId}
+                onChange={(val) => setForm({...form, doctorId: val})}
+                options={doctors}
+                placeholder="Select a doctor..."
+                getOptionLabel={(d) => `${d.name} - ${d.specialization}`}
+                required
+              />
 
-          <input
-            type="datetime-local"
-            name="dateOfDeath"
-            className="input"
-            onChange={update}
-          />
+              {/* Ward */}
+              <div>
+                <label className={label}>Ward</label>
+                <input
+                  name="ward"
+                  className={input}
+                  placeholder="e.g., ICU, Ward A, General Ward"
+                  value={form.ward}
+                  onChange={update}
+                />
+              </div>
+            </div>
+          </section>
 
-          <textarea
-            name="remarks"
-            placeholder="Remarks"
-            className="input h-24"
-            onChange={update}
-          />
+          {/* DEATH DETAILS SECTION */}
+          <section className={sectionClass}>
+            <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2 border-b border-slate-800 pb-4">
+              <FileText className="w-5 h-5 text-purple-500" />
+              Death Details
+            </h2>
+            <div className="space-y-6">
+              {/* Cause of Death */}
+              <div>
+                <label className={label}>Cause of Death *</label>
+                <input
+                  name="causeOfDeath"
+                  className={input}
+                  placeholder="Enter the cause of death"
+                  required
+                  value={form.causeOfDeath}
+                  onChange={update}
+                />
+              </div>
 
-          <button className="px-4 py-2 bg-green-600 text-white rounded">
-            Save Report
-          </button>
+              {/* Date of Death */}
+              <div>
+                <label className={label}>Date of Death *</label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-3 w-5 h-5 text-slate-500 pointer-events-none" />
+                  <input
+                    type="datetime-local"
+                    name="dateOfDeath"
+                    className={`${input} pl-10`}
+                    required
+                    value={form.dateOfDeath}
+                    onChange={update}
+                  />
+                </div>
+              </div>
 
-          <a href="/deathreports" className="ml-3 text-slate-600">
-            Back
-          </a>
-        </form>
+              {/* Remarks */}
+              <div>
+                <label className={label}>Remarks</label>
+                <textarea
+                  name="remarks"
+                  placeholder="Additional remarks or notes about the death (optional)"
+                  className={`${textarea} h-32`}
+                  value={form.remarks}
+                  onChange={update}
+                />
+              </div>
+            </div>
+          </section>
+
+          </form>
+        </div>
       </div>
     </Layout>
   );

@@ -19,11 +19,6 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
-/**
- * ✅ Secures API endpoints under /api/**
- * ✅ Handles JWT authentication (no conflict with Thymeleaf or H2)
- * ✅ Compatible with Spring Boot 3.5.x & Spring Security 6.x
- */
 @Configuration
 @EnableMethodSecurity
 public class JwtSecurityConfig {
@@ -31,50 +26,57 @@ public class JwtSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtAuthenticationFilter jwtFilter;
 
-    public JwtSecurityConfig(UserDetailsServiceImpl userDetailsService, JwtAuthenticationFilter jwtFilter) {
+    public JwtSecurityConfig(UserDetailsServiceImpl userDetailsService,
+                             JwtAuthenticationFilter jwtFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtFilter = jwtFilter;
     }
 
     @Bean
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+
         http
-            // ✅ Apply this config only to /api/** paths
-            .securityMatcher("/api/**")
+                // Apply ONLY to /api/**
+                .securityMatcher("/api/**")
 
-            // ✅ Configure CORS to allow React frontend (Vite default: 5173)
-            .cors(cors -> cors.configurationSource(request -> {
-                CorsConfiguration cfg = new CorsConfiguration();
-                cfg.setAllowedOrigins(List.of(
-                        "http://localhost:5173",  // React Vite Dev
-                        "http://localhost:3000"   // (optional) if using CRA
-                ));
-                cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                cfg.setAllowedHeaders(List.of("*"));
-                cfg.setAllowCredentials(true);
-                return cfg;
-            }))
+                // CORS for Next.js or Vite
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration cfg = new CorsConfiguration();
+                    cfg.setAllowedOrigins(List.of(
+                            "http://localhost:3000",
+                            "http://localhost:5173"
+                    ));
+                    cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                    cfg.setAllowedHeaders(List.of("*"));
+                    cfg.setAllowCredentials(true);
+                    return cfg;
+                }))
 
-            // ✅ Disable CSRF for stateless JWT API
-            .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable())
 
-            // ✅ Set up endpoint authorization
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/actuator/**").permitAll()  // public auth routes
-                .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll() // optional public GETs
-                .anyRequest().authenticated()                                 // secure all others
-            )
+                .authorizeHttpRequests(auth -> auth
+                        // Public auth endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
 
-            // ✅ Add JWT filter before Spring’s UsernamePasswordAuthenticationFilter
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                        // FULL PUBLIC ACCESS TO PHARMACY API (fix saving medicine)
+                        .requestMatchers("/api/pharmacy/**").permitAll()
 
-            // ✅ Allow basic auth fallback (useful for debugging)
-            .httpBasic(Customizer.withDefaults());
+                        // Public GET APIs if any
+                        .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
+
+                        // Everything else protected by JWT
+                        .anyRequest().authenticated()
+                )
+
+                // JWT Filter BEFORE UsernamePasswordAuthenticationFilter
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // Basic for debugging
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
 
-    // ✅ Authentication Manager Bean (for login)
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -83,7 +85,6 @@ public class JwtSecurityConfig {
         return new ProviderManager(provider);
     }
 
-    // ✅ Use BCrypt for password hashing (matches your seed data)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

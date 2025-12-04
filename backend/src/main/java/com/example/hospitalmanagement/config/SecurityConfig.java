@@ -2,6 +2,7 @@ package com.example.hospitalmanagement.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -9,45 +10,51 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
- * ✅ Handles security for H2 console & Thymeleaf UI only.
- * ✅ Keeps API (/api/**) security isolated in JwtSecurityConfig.
- * ✅ Compatible with Spring Boot 3.5.x & Security 6.x.
+ * 🔐 UI Security (Thymeleaf + H2 console)
+ * Applies ONLY to:
+ *   - /
+ *   - /index
+ *   - /css/**
+ *   - /js/**
+ *   - /images/**
+ *   - /webjars/**
+ *   - /h2-console/**
+ *
+ * API security is handled separately in JwtSecurityConfig.
  */
 @Configuration
+@Order(1)  // 🔥 MUST RUN BEFORE JwtSecurityConfig
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain uiSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // ✅ Apply only to web UI and H2 console paths
-            .securityMatcher("/h2-console/**", "/", "/index", "/css/**", "/js/**", "/images/**", "/webjars/**")
+            // Apply ONLY to UI + H2 console paths
+            .securityMatcher(
+                    "/",
+                    "/index",
+                    "/h2-console/**",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/webjars/**"
+            )
 
             .authorizeHttpRequests(auth -> auth
-                // Allow unrestricted access to H2 console
-                .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
+                .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/", "/index").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
 
-                // Allow static resources and root paths
-                .requestMatchers(
-                        new AntPathRequestMatcher("/"),
-                        new AntPathRequestMatcher("/index"),
-                        new AntPathRequestMatcher("/css/**"),
-                        new AntPathRequestMatcher("/js/**"),
-                        new AntPathRequestMatcher("/images/**"),
-                        new AntPathRequestMatcher("/webjars/**")
-                ).permitAll()
-
-                // Everything else in this matcher requires authentication
+                // anything matched by this chain but not listed → requires auth
                 .anyRequest().authenticated()
             )
 
-            // ✅ Disable CSRF for H2 console
-            .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
-
-            // ✅ Allow frames from the same origin (needed by H2 console)
+            // Allow H2 console
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
 
-            // ✅ Basic auth for simplicity (you can replace with formLogin if needed)
+            // basic UI authentication (you can switch to formLogin)
             .httpBasic(withDefaults());
 
         return http.build();

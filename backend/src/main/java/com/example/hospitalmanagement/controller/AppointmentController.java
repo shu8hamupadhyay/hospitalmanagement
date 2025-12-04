@@ -4,17 +4,24 @@ import com.example.hospitalmanagement.model.Appointment;
 import com.example.hospitalmanagement.model.Department;
 import com.example.hospitalmanagement.model.Doctor;
 import com.example.hospitalmanagement.model.Patient;
+
 import com.example.hospitalmanagement.service.AppointmentService;
 import com.example.hospitalmanagement.service.DepartmentService;
 import com.example.hospitalmanagement.service.DoctorService;
 import com.example.hospitalmanagement.service.PatientService;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/appointments")
-@CrossOrigin(origins = "*")
+/**
+ * Spring MVC controller for Appointment entity (Thymeleaf views).
+ * Uses pure entity model, NOT DTO.
+ */
+@Controller
+@RequestMapping("/appointments")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
@@ -22,97 +29,104 @@ public class AppointmentController {
     private final DoctorService doctorService;
     private final PatientService patientService;
 
-    public AppointmentController(AppointmentService appointmentService,
-                                 DepartmentService departmentService,
-                                 DoctorService doctorService,
-                                 PatientService patientService) {
+    public AppointmentController(
+            AppointmentService appointmentService,
+            DepartmentService departmentService,
+            DoctorService doctorService,
+            PatientService patientService
+    ) {
         this.appointmentService = appointmentService;
         this.departmentService = departmentService;
         this.doctorService = doctorService;
         this.patientService = patientService;
     }
 
-    // ==========================================================
-    // 📋 List All Appointments
-    // ==========================================================
+    // -------------------------------------------------------------
+    // LIST PAGE
+    // -------------------------------------------------------------
     @GetMapping
-    public List<Appointment> getAppointments() {
-        return appointmentService.getAllAppointments();
+    public String listAppointments(Model model) {
+        model.addAttribute("appointments", appointmentService.getAllAppointments());
+        return "appointments";
     }
 
-    // ==========================================================
-    // ➕ Add New Appointment
-    // ==========================================================
-    @PostMapping
-    public Appointment saveAppointment(@RequestBody Appointment appointment) {
-
-        // Link Department
-        if (appointment.getDepartment() != null && appointment.getDepartment().getId() != null) {
-            Department dept = departmentService.getDepartmentById(appointment.getDepartment().getId());
-            appointment.setDepartment(dept);
-        } else {
-            appointment.setDepartment(null);
-        }
-
-        // Link Doctor
-        if (appointment.getDoctor() != null && appointment.getDoctor().getId() != null) {
-            Doctor doctor = doctorService.getDoctorById(appointment.getDoctor().getId());
-            appointment.setDoctor(doctor);
-        } else {
-            appointment.setDoctor(null);
-        }
-
-        // Link Patient
-        if (appointment.getPatient() != null && appointment.getPatient().getId() != null) {
-            patientService.getPatientById(appointment.getPatient().getId())
-                    .ifPresent(appointment::setPatient);
-        } else {
-            appointment.setPatient(null);
-        }
-
-        // Auto-generate Serial No (Token)
-        if (appointment.getSerialNo() == null || appointment.getSerialNo().isEmpty()) {
-            if (appointment.getDepartment() != null && appointment.getDepartment().getName() != null) {
-                String prefix = appointment.getDepartment().getName()
-                        .substring(0, Math.min(3, appointment.getDepartment().getName().length()))
-                        .toUpperCase();
-                long count = appointmentService.countByDepartment(appointment.getDepartment().getId()) + 1;
-                appointment.setSerialNo(prefix + "-" + String.format("%03d", count));
-            } else {
-                appointment.setSerialNo("GEN-" + System.currentTimeMillis());
-            }
-        }
-
-        // Default status
-        if (appointment.getStatus() == null || appointment.getStatus().isBlank()) {
-            appointment.setStatus("Active");
-        }
-
-        return appointmentService.saveAppointment(appointment);
+    // -------------------------------------------------------------
+    // NEW FORM
+    // -------------------------------------------------------------
+    @GetMapping("/new")
+    public String newAppointmentForm(Model model) {
+        model.addAttribute("appointment", new Appointment());
+        model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("doctors", doctorService.getAllDoctors());
+        model.addAttribute("patients", patientService.getAllPatients());
+        return "appointment-form";
     }
 
-    // ==========================================================
-    // ✏️ Edit / Get One Appointment
-    // ==========================================================
-    @GetMapping("/{id}")
-    public Appointment getAppointmentById(@PathVariable Long id) {
-        return appointmentService.getAppointmentById(id)
+    // -------------------------------------------------------------
+    // EDIT FORM
+    // -------------------------------------------------------------
+    @GetMapping("/edit/{id}")
+    public String editAppointment(@PathVariable Long id, Model model) {
+
+        Appointment appt = appointmentService.getAppointmentById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid appointment ID: " + id));
+
+        model.addAttribute("appointment", appt);
+        model.addAttribute("departments", departmentService.getAllDepartments());
+        model.addAttribute("doctors", doctorService.getAllDoctors());
+        model.addAttribute("patients", patientService.getAllPatients());
+
+        return "appointment-form";
     }
 
-    // ==========================================================
-    // 🗑️ Delete Appointment
-    // ==========================================================
-    @DeleteMapping("/{id}")
-    public void deleteAppointment(@PathVariable Long id) {
+    // -------------------------------------------------------------
+    // SAVE (CREATE / UPDATE)
+    // -------------------------------------------------------------
+    @PostMapping
+    public String saveAppointment(@ModelAttribute("appointment") Appointment appt) {
+
+        // ----------- Department -----------
+        if (appt.getDepartment() != null && appt.getDepartment().getId() != null) {
+            Department d = departmentService.getDepartmentById(appt.getDepartment().getId());
+            appt.setDepartment(d);
+        } else {
+            appt.setDepartment(null);
+        }
+
+        // ----------- Doctor -----------
+        if (appt.getDoctor() != null && appt.getDoctor().getId() != null) {
+            Doctor doc = doctorService.getDoctorById(appt.getDoctor().getId());
+            appt.setDoctor(doc);
+        } else {
+            appt.setDoctor(null);
+        }
+
+        // ----------- Patient -----------
+        if (appt.getPatient() != null && appt.getPatient().getId() != null) {
+            Optional<Patient> pOpt = patientService.getPatientById(appt.getPatient().getId());
+            Patient p = pOpt.orElseThrow(() ->
+                    new RuntimeException("Invalid patient ID: " + appt.getPatient().getId()));
+            appt.setPatient(p);
+        } else {
+            appt.setPatient(null);
+        }
+
+        // ----------- Serial number for NEW appointment -----------
+        if (appt.getId() == null) {
+            appointmentService.generateSerialIfNew(appt);
+        }
+
+        appointmentService.saveAppointment(appt);
+
+        return "redirect:/appointments";
+    }
+
+    // -------------------------------------------------------------
+    // DELETE
+    // -------------------------------------------------------------
+    @GetMapping("/delete/{id}")
+    public String deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteAppointment(id);
-    }
-
-    // ==========================================================
-    // 🔁 Filter Doctors by Department (React AJAX)
-    // ==========================================================
-    @GetMapping("/doctors/by-department/{departmentId}")
-    public List<Doctor> getDoctorsByDepartment(@PathVariable Long departmentId) {
-        return doctorService.getDoctorsByDepartment(departmentId);
+        return "redirect:/appointments";
     }
 }

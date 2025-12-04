@@ -1,6 +1,7 @@
 package com.example.hospitalmanagement.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,8 +16,20 @@ public class LabReport {
     @Lob
     private String notes;
 
-    @ManyToOne @JoinColumn(name = "patient_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patient_id")
+    @JsonIgnoreProperties({"appointments", "deathReports", "labreports", "hibernateLazyInitializer", "handler"})
     private Patient patient;
+
+    public LabReport() {}
+
+    public LabReport(String testName, String result, LocalDateTime reportDate, String notes, Patient patient) {
+        this.testName = testName;
+        this.result = result;
+        this.reportDate = reportDate;
+        this.notes = notes;
+        this.patient = patient;
+    }
 
     // getters & setters
     public Long getId() { return id; }

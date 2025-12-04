@@ -12,8 +12,11 @@ import java.util.List;
 // Hide Hibernate proxy fields
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 
-// Prevent infinite JSON recursion with object IDs
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+// Prevent infinite JSON recursion
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class Doctor {
 
     @Id
@@ -35,17 +38,20 @@ public class Doctor {
     @Column(length = 100)
     private String specialization;
 
-    // Many doctors → one department
+    // 🔥 Correct Many-to-One mapping
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id")
-    @JsonIgnoreProperties({"doctors", "appointments"}) // prevent loops
+    @JsonIgnoreProperties({"doctors", "appointments"})
     private Department department;
 
-    // One doctor → many appointments
+    // 🔥 Avoid recursive JSON loops
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"doctor", "patient", "department"}) // prevent loops
+    @JsonIgnoreProperties({"doctor", "patient", "department"})
     private List<Appointment> appointments;
 
+    // ----------------------------------------------------
+    // CONSTRUCTORS
+    // ----------------------------------------------------
     public Doctor() {}
 
     public Doctor(String name, String email, String phone, String qualification, String specialization) {
@@ -56,7 +62,9 @@ public class Doctor {
         this.specialization = specialization;
     }
 
-    // Getters & Setters
+    // ----------------------------------------------------
+    // GETTERS & SETTERS
+    // ----------------------------------------------------
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

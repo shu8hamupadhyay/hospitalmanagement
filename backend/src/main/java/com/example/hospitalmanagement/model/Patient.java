@@ -72,6 +72,16 @@ public class Patient {
     @JsonIgnoreProperties({"patient", "doctor", "department"}) // avoid loops
     private List<Appointment> appointments;
 
+    // One Patient → Many Death Reports
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"patient", "doctor"}) // avoid loops
+    private List<DeathReport> deathReports;
+
+    // One Patient → Many Lab Reports
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"patient"}) // avoid loops
+    private List<LabReport> labreports;
+
     public Patient() {}
 
     // Getters & Setters
@@ -143,6 +153,12 @@ public class Patient {
 
     public List<Appointment> getAppointments() { return appointments; }
     public void setAppointments(List<Appointment> appointments) { this.appointments = appointments; }
+
+    public List<DeathReport> getDeathReports() { return deathReports; }
+    public void setDeathReports(List<DeathReport> deathReports) { this.deathReports = deathReports; }
+
+    public List<LabReport> getLabreports() { return labreports; }
+    public void setLabreports(List<LabReport> labreports) { this.labreports = labreports; }
 
     @Override
     public String toString() {

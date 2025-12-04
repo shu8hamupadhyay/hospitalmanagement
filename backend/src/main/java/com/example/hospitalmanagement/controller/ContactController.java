@@ -18,7 +18,7 @@ public class ContactController {
 
     @GetMapping
     public String listContacts(Model model) {
-        model.addAttribute("contacts", contactService.getAllContacts());
+        model.addAttribute("contacts", contactService.findAll());
         return "contacts/contact-list";
     }
 
@@ -30,32 +30,32 @@ public class ContactController {
 
     @PostMapping("/add")
     public String saveContact(@ModelAttribute Contact contact) {
-        contactService.saveContact(contact);
+        contactService.save(contact);
         return "redirect:/contacts";
     }
 
     @GetMapping("/edit/{id}")
     public String editContact(@PathVariable Long id, Model model) {
-        model.addAttribute("contact", contactService.getContactById(id));
+        model.addAttribute("contact", contactService.findById(id));
         return "contacts/edit-contact";
     }
 
     @PostMapping("/update/{id}")
     public String updateContact(@PathVariable Long id, @ModelAttribute Contact contact) {
         contact.setId(id);
-        contactService.saveContact(contact);
+        contactService.save(contact);
         return "redirect:/contacts";
     }
 
     @GetMapping("/delete/{id}")
     public String deleteContact(@PathVariable Long id) {
-        contactService.deleteContact(id);
+        contactService.delete(id);
         return "redirect:/contacts";
     }
 
     @GetMapping("/view/{id}")
     public String viewContact(@PathVariable Long id, Model model) {
-        model.addAttribute("contact", contactService.getContactById(id));
+        model.addAttribute("contact", contactService.findById(id));
         return "contacts/view-contact";
     }
 }

@@ -1,17 +1,32 @@
 package com.example.hospitalmanagement.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "death_reports")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DeathReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "patient_name", nullable = false)
+    // Patient Relationship
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "patient_id")
+    @JsonIgnoreProperties({"doctor", "appointments", "deathReports"})
+    private Patient patient;
+
+    // Doctor Relationship
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "doctor_id")
+    @JsonIgnoreProperties({"department", "appointments"})
+    private Doctor doctor;
+
+    // Legacy fields for reference (can be kept or removed)
+    @Column(name = "patient_name")
     private String patientName;
 
     private String gender;
@@ -19,7 +34,7 @@ public class DeathReport {
     @Column(name = "cause_of_death", nullable = false)
     private String causeOfDeath;
 
-    @Column(name = "doctor_name", nullable = false)
+    @Column(name = "doctor_name")
     private String doctorName;
 
     private String ward;
@@ -32,9 +47,26 @@ public class DeathReport {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // Getters and Setters
+    // Default Constructor
+    public DeathReport() {}
+
+    // Constructor with basic fields
+    public DeathReport(Patient patient, Doctor doctor, String causeOfDeath, String ward) {
+        this.patient = patient;
+        this.doctor = doctor;
+        this.causeOfDeath = causeOfDeath;
+        this.ward = ward;
+    }
+
+    // ===== GETTERS & SETTERS =====
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public Patient getPatient() { return patient; }
+    public void setPatient(Patient patient) { this.patient = patient; }
+
+    public Doctor getDoctor() { return doctor; }
+    public void setDoctor(Doctor doctor) { this.doctor = doctor; }
 
     public String getPatientName() { return patientName; }
     public void setPatientName(String patientName) { this.patientName = patientName; }

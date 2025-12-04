@@ -15,19 +15,19 @@ public class ContactService {
         this.contactRepository = contactRepository;
     }
 
-    public List<Contact> getAllContacts() {
+    public List<Contact> findAll() {
         return contactRepository.findAll();
     }
 
-    public Contact getContactById(Long id) {
+    public Contact findById(Long id) {
         return contactRepository.findById(id).orElse(null);
     }
 
-    public Contact saveContact(Contact contact) {
+    public Contact save(Contact contact) {
         return contactRepository.save(contact);
     }
 
-    public void deleteContact(Long id) {
+    public void delete(Long id) {
         contactRepository.deleteById(id);
     }
 }

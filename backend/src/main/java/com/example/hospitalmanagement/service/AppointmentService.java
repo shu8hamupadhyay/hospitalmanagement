@@ -20,68 +20,85 @@ public class AppointmentService {
         this.appointmentRepository = appointmentRepository;
     }
 
-    // ==========================================================
-    // 📋 Get All Appointments
-    // ==========================================================
+    // -----------------------------------------------------------
+    // GET ALL
+    // -----------------------------------------------------------
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAll();
     }
 
-    // ==========================================================
-    // 🔍 Get Appointment by ID
-    // ==========================================================
+    // -----------------------------------------------------------
+    // GET ONE
+    // -----------------------------------------------------------
     public Optional<Appointment> getAppointmentById(Long id) {
         return appointmentRepository.findById(id);
     }
 
-    // ==========================================================
-    // 💾 Save Appointment (auto token + default status)
-    // ==========================================================
+    // -----------------------------------------------------------
+    // SAVE APPOINTMENT
+    // -----------------------------------------------------------
     public Appointment saveAppointment(Appointment appointment) {
-        // ✅ Auto-generate Serial No (token)
-        if (appointment.getSerialNo() == null || appointment.getSerialNo().isBlank()) {
-            if (appointment.getDepartment() != null && appointment.getDepartment().getName() != null) {
-                String prefix = appointment.getDepartment().getName()
-                        .substring(0, Math.min(3, appointment.getDepartment().getName().length()))
-                        .toUpperCase();
 
-                long count = appointmentRepository.countByDepartmentId(appointment.getDepartment().getId());
-                String serial = String.format("%s-%03d", prefix, count + 1);
-                appointment.setSerialNo(serial);
-            } else {
-                appointment.setSerialNo("GEN-" + System.currentTimeMillis());
-            }
+        // Default audit
+        if (appointment.getLastModifiedBy() == null || appointment.getLastModifiedBy().isBlank()) {
+            appointment.setLastModifiedBy("SYSTEM_AUTO");
         }
 
-        // ✅ Default Status
+        // Default status
         if (appointment.getStatus() == null || appointment.getStatus().isBlank()) {
-            appointment.setStatus("Active");
+            appointment.setStatus("Scheduled");
+        }
+
+        // Auto-cancel reason
+        if ("Cancelled".equalsIgnoreCase(appointment.getStatus())) {
+            if (appointment.getCancellationReason() == null || appointment.getCancellationReason().isBlank()) {
+                appointment.setCancellationReason("Patient Requested Cancellation");
+            }
         }
 
         return appointmentRepository.save(appointment);
     }
 
-    // ==========================================================
-    // 🗑️ Delete Appointment by ID (safe)
-    // ==========================================================
+    // -----------------------------------------------------------
+    // FIXED SERIAL NUMBER GENERATION
+    // -----------------------------------------------------------
+    public void generateSerialIfNew(Appointment appointment) {
+
+        // Only generate serial for NEW appointments
+        if (appointment.getId() != null) return;
+        if (appointment.getSerialNo() != null && !appointment.getSerialNo().isBlank()) return;
+
+        // If controller has not assigned department yet → skip
+        if (appointment.getDepartment() == null || appointment.getDepartment().getId() == null) {
+            appointment.setSerialNo("GEN-" + System.currentTimeMillis());
+            return;
+        }
+
+        // SAFETY FIX: avoid NullPointerException
+        String deptName = appointment.getDepartment().getName();
+        if (deptName == null || deptName.isBlank()) {
+            deptName = "GEN";
+        }
+
+        String prefix = deptName.substring(0, Math.min(3, deptName.length())).toUpperCase();
+
+        long count = appointmentRepository.countByDepartmentId(appointment.getDepartment().getId());
+
+        appointment.setSerialNo(String.format("%s-%03d", prefix, count + 1));
+    }
+
+    // -----------------------------------------------------------
+    // DELETE
+    // -----------------------------------------------------------
     public void deleteAppointment(Long id) {
         if (appointmentRepository.existsById(id)) {
             appointmentRepository.deleteById(id);
-        } else {
-            System.err.println("⚠️ Warning: Attempted to delete non-existent appointment with ID: " + id);
         }
     }
 
-    // ==========================================================
-    // 🔢 Count by Department (for token generation)
-    // ==========================================================
-    public long countByDepartment(Long departmentId) {
-        return appointmentRepository.countByDepartmentId(departmentId);
-    }
-
-    // ==========================================================
-    // 🔍 Find Appointments by Doctor or Patient
-    // ==========================================================
+    // -----------------------------------------------------------
+    // FILTERS / ANALYTICS
+    // -----------------------------------------------------------
     public List<Appointment> getAppointmentsByDoctor(Long doctorId) {
         return appointmentRepository.findByDoctorId(doctorId);
     }
@@ -90,35 +107,24 @@ public class AppointmentService {
         return appointmentRepository.findByPatientId(patientId);
     }
 
-    // ==========================================================
-    // 📅 Count Today's Appointments
-    // ==========================================================
     public long countAppointmentsToday() {
         LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay().minusNanos(1);
-        return appointmentRepository.countByAppointmentDateBetween(startOfDay, endOfDay);
+        return appointmentRepository.countByAppointmentDateBetween(
+                today.atStartOfDay(),
+                today.plusDays(1).atStartOfDay().minusNanos(1)
+        );
     }
 
-    // ==========================================================
-    // ⏳ Find Upcoming Appointments (for Dashboard)
-    // ==========================================================
     public List<Appointment> findUpcomingAppointments(LocalDateTime now) {
         return appointmentRepository.findByAppointmentDateAfterOrderByAppointmentDateAsc(now);
     }
 
-    // ==========================================================
-    // 💰 Calculate Total Revenue (if fee column exists)
-    // ==========================================================
     public double calculateTotalRevenue() {
         return appointmentRepository.findAll().stream()
                 .mapToDouble(a -> a.getFee() != null ? a.getFee() : 0.0)
                 .sum();
     }
 
-    // ==========================================================
-    // 📊 Count Between Dates (for Analytics/Reports)
-    // ==========================================================
     public long countAppointmentsBetween(LocalDateTime start, LocalDateTime end) {
         return appointmentRepository.countByAppointmentDateBetween(start, end);
     }

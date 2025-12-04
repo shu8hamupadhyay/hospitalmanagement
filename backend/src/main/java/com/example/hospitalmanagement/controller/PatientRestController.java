@@ -1,113 +1,157 @@
-package com.example.hospitalmanagement.controller;
+package com.example.hospitalmanagement.controller.api;
+
+import com.example.hospitalmanagement.dto.PatientDTO;
+import com.example.hospitalmanagement.dto.mapper.PatientDTOMapper;
 
 import com.example.hospitalmanagement.model.Patient;
 import com.example.hospitalmanagement.model.Doctor;
+
 import com.example.hospitalmanagement.service.PatientService;
 import com.example.hospitalmanagement.service.DoctorService;
+
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/patients")
-@CrossOrigin(origins = "*") // allow Next.js
+@CrossOrigin(origins = "*")
 public class PatientRestController {
 
     private final PatientService patientService;
-    private final DoctorService doctorService;
+    private final DoctorService doctorService;  // ENTITY service
 
     public PatientRestController(PatientService patientService, DoctorService doctorService) {
         this.patientService = patientService;
         this.doctorService = doctorService;
     }
 
-    // ==========================================================
-    // 🩺 Get ALL patients (React requires array)
-    // ==========================================================
+    // =====================================================
+    // GET ALL — DTO List
+    // =====================================================
     @GetMapping
-    public List<Patient> getAllPatients() {
-        return patientService.getAllPatients();
+    public List<PatientDTO> getAllPatients() {
+        return patientService.getAllPatients()
+                .stream()
+                .map(PatientDTOMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
-    // ==========================================================
-    // 🔍 Get patient BY ID
-    // ==========================================================
+    // =====================================================
+    // GET ONE — DTO
+    // =====================================================
     @GetMapping("/{id}")
-    public Patient getPatientById(@PathVariable Long id) {
-        return patientService.getPatientById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found with id " + id));
+    public PatientDTO getPatientById(@PathVariable Long id) {
+        Patient p = patientService.getPatientById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        return PatientDTOMapper.toDTO(p);
     }
 
-    // ==========================================================
-    // ➕ Create new patient
-    // ==========================================================
+    // =====================================================
+    // CREATE — DTO Based
+    // =====================================================
     @PostMapping
-    public Patient createPatient(@RequestBody Patient patient) {
+    public PatientDTO createPatient(@RequestBody PatientDTO dto) {
 
-        // Assign doctor if provided
-        if (patient.getDoctor() != null && patient.getDoctor().getId() != null) {
-            Doctor doctor = doctorService.getDoctorById(patient.getDoctor().getId());
-            patient.setDoctor(doctor);
-        } else {
-            patient.setDoctor(null);
+        Patient p = new Patient();
+
+        // BASIC FIELDS
+        p.setName(dto.getName());
+        p.setAge(dto.getAge());
+        p.setGender(dto.getGender());
+        p.setEmail(dto.getEmail());
+        p.setPhone(dto.getPhone());
+
+        p.setDob(dto.getDob() != null ? LocalDate.parse(dto.getDob()) : null);
+
+        p.setAddress(dto.getAddress());
+        p.setCity(dto.getCity());
+        p.setState(dto.getState());
+        p.setCountry(dto.getCountry());
+
+        p.setBloodGroup(dto.getBloodGroup());
+        p.setMaritalStatus(dto.getMaritalStatus());
+
+        p.setMedicalHistory(dto.getMedicalHistory());
+        p.setAllergies(dto.getAllergies());
+        p.setCurrentMedications(dto.getCurrentMedications());
+
+        p.setEmergencyContactName(dto.getEmergencyContactName());
+        p.setEmergencyContactNumber(dto.getEmergencyContactNumber());
+        p.setRelationshipToPatient(dto.getRelationshipToPatient());
+
+        p.setInsuranceProvider(dto.getInsuranceProvider());
+        p.setInsurancePolicyNumber(dto.getInsurancePolicyNumber());
+
+        // DOCTOR (DTO → ENTITY)
+        if (dto.getDoctorId() != null) {
+            Doctor doctor = doctorService.getDoctorById(dto.getDoctorId());
+            if (doctor == null)
+                throw new RuntimeException("Invalid doctor ID: " + dto.getDoctorId());
+            p.setDoctor(doctor);
         }
 
-        return patientService.savePatient(patient);
+        Patient saved = patientService.savePatient(p);
+        return PatientDTOMapper.toDTO(saved);
     }
 
-    // ==========================================================
-    // ✏️ Update patient
-    // ==========================================================
+    // =====================================================
+    // UPDATE — DTO Based
+    // =====================================================
     @PutMapping("/{id}")
-    public Patient updatePatient(@PathVariable Long id, @RequestBody Patient updated) {
+    public PatientDTO updatePatient(@PathVariable Long id, @RequestBody PatientDTO dto) {
 
         Patient existing = patientService.getPatientById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid patient ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Invalid patient ID"));
 
-        // Basic info
-        existing.setName(updated.getName());
-        existing.setEmail(updated.getEmail());
-        existing.setPhone(updated.getPhone());
-        existing.setAge(updated.getAge());
-        existing.setGender(updated.getGender());
-        existing.setDob(updated.getDob());
+        // BASIC FIELDS
+        existing.setName(dto.getName());
+        existing.setAge(dto.getAge());
+        existing.setGender(dto.getGender());
+        existing.setEmail(dto.getEmail());
+        existing.setPhone(dto.getPhone());
 
-        // Address info
-        existing.setAddress(updated.getAddress());
-        existing.setCity(updated.getCity());
-        existing.setState(updated.getState());
-        existing.setCountry(updated.getCountry());
+        existing.setDob(dto.getDob() != null ? LocalDate.parse(dto.getDob()) : null);
 
-        // Medical info
-        existing.setBloodGroup(updated.getBloodGroup());
-        existing.setMaritalStatus(updated.getMaritalStatus());
-        existing.setMedicalHistory(updated.getMedicalHistory());
-        existing.setAllergies(updated.getAllergies());
-        existing.setCurrentMedications(updated.getCurrentMedications());
+        existing.setAddress(dto.getAddress());
+        existing.setCity(dto.getCity());
+        existing.setState(dto.getState());
+        existing.setCountry(dto.getCountry());
 
-        // Emergency contact
-        existing.setEmergencyContactName(updated.getEmergencyContactName());
-        existing.setEmergencyContactNumber(updated.getEmergencyContactNumber());
-        existing.setRelationshipToPatient(updated.getRelationshipToPatient());
+        existing.setBloodGroup(dto.getBloodGroup());
+        existing.setMaritalStatus(dto.getMaritalStatus());
 
-        // Insurance
-        existing.setInsuranceProvider(updated.getInsuranceProvider());
-        existing.setInsurancePolicyNumber(updated.getInsurancePolicyNumber());
+        existing.setMedicalHistory(dto.getMedicalHistory());
+        existing.setAllergies(dto.getAllergies());
+        existing.setCurrentMedications(dto.getCurrentMedications());
 
-        // Doctor update
-        if (updated.getDoctor() != null && updated.getDoctor().getId() != null) {
-            Doctor doctor = doctorService.getDoctorById(updated.getDoctor().getId());
+        existing.setEmergencyContactName(dto.getEmergencyContactName());
+        existing.setEmergencyContactNumber(dto.getEmergencyContactNumber());
+        existing.setRelationshipToPatient(dto.getRelationshipToPatient());
+
+        existing.setInsuranceProvider(dto.getInsuranceProvider());
+        existing.setInsurancePolicyNumber(dto.getInsurancePolicyNumber());
+
+        // DOCTOR — DTO → ENTITY
+        if (dto.getDoctorId() != null) {
+            Doctor doctor = doctorService.getDoctorById(dto.getDoctorId());
+            if (doctor == null)
+                throw new RuntimeException("Invalid doctor ID: " + dto.getDoctorId());
             existing.setDoctor(doctor);
         } else {
             existing.setDoctor(null);
         }
 
-        return patientService.savePatient(existing);
+        Patient updated = patientService.savePatient(existing);
+        return PatientDTOMapper.toDTO(updated);
     }
 
-    // ==========================================================
-    // ❌ Delete patient
-    // ==========================================================
+    // =====================================================
+    // DELETE
+    // =====================================================
     @DeleteMapping("/{id}")
     public void deletePatient(@PathVariable Long id) {
         patientService.deletePatient(id);
